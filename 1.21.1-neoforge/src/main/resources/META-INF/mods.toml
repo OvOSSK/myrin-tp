@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[7,)"
+loaderVersion="[3,]"
 license="MIT"
 issueTrackerURL="https://github.com/OvOSSK/myrin-tp/issues"
 
@@ -7,7 +7,6 @@ issueTrackerURL="https://github.com/OvOSSK/myrin-tp/issues"
 modId="myrintp"
 version="${version}"
 displayName="Myrin TP"
-logoFile="myrintp.png"
 credits="OvOSSK"
 authors="OvOSSK"
 description='''Myrin TP：传送 + 指令限制一体的服务端模组。
