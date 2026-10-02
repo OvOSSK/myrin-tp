@@ -1,6 +1,6 @@
 # Myrin TP
 
-Minecraft 服务端的传送 + 指令限制模组。纯服务端逻辑、无 Mixin、无作弊，不需要额外前置（各平台的官方加载器除外）。
+Minecraft 服务端的传送 + 指令限制可配置模组。纯服务端逻辑、无 Mixin、无作弊，不需要额外前置（各平台的官方加载器除外）。
 
 ## 版本
 
@@ -14,7 +14,7 @@ Minecraft 服务端的传送 + 指令限制模组。纯服务端逻辑、无 Mix
 
 ## 功能
 
-### 传送指令，玩家可用，无需作弊
+### 便携传送指令，玩家可用，无需作弊
 
 `/tpa` `/tpahere` `/tpyes`(`/tpaccept`) `/tpno`(`/tpdeny`) `/tpcancel` `/tplist` `/sethome` `/home` `/homes` `/delhome` `/renamehome` `/back` `/tpr`(`/rtp`)
 
@@ -53,11 +53,3 @@ cd 1.20.1-forge    # 或 1.21.1-neoforge / 26.3-fabric
 ```
 
 产物在 `build/libs/`。
-
-## 发布
-
-推 `v*` tag 后 GitHub Actions 自动构建三个平台并上传到 Releases（见 `.github/workflows/build-release.yml`）。
-
-## 许可证
-
-MIT © OvOSSK
