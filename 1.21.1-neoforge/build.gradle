@@ -7,7 +7,7 @@ group = 'com.myrin'
 version = "${mod_version}"
 
 base {
-    archivesName = "myrintp-neoforge"
+    archivesName = "1.21.1-neoforge"
 }
 
 java {

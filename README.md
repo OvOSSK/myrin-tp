@@ -1,6 +1,6 @@
 # Myrin TP
 
-Minecraft 服务端的传送 + 指令限制模组，把「Only TP」和「StellarRTP」两个模组的功能合并配合AI重写代码结构。纯服务端逻辑、无 Mixin、无作弊，不需要额外前置（各平台的官方加载器除外）。
+Minecraft 服务端的传送 + 指令限制模组。纯服务端逻辑、无 Mixin、无作弊，不需要额外前置（各平台的官方加载器除外）。
 
 ## 版本
 
@@ -22,7 +22,7 @@ Minecraft 服务端的传送 + 指令限制模组，把「Only TP」和「Stella
 - 家点可以命名，默认上限 20 个
 - /back 返回上一个位置，死了优先回死亡点
 
-### Only TP 指令限制（服主配置）
+### 指令守卫（服主配置）
 
 | mode | 效果 |
 |---|---|
@@ -33,7 +33,7 @@ Minecraft 服务端的传送 + 指令限制模组，把「Only TP」和「Stella
 
 - 模式一、二各有独立黑名单，名单内玩家在对应模式豁免
 - 模式二带指令白名单，默认放行 seed/msg/tell/w/help/list/me
-- 游戏内配置：`/otp mode <0-3>`、`/otp blacklist1|blacklist2 add|remove|list <玩家>`、`/otp whitelist add|remove|list <指令>`、`/otp status`、`/otp reload`
+- 游戏内配置：`/mtp mode <0-3>`、`/mtp blacklist1|blacklist2 add|remove|list <玩家>`、`/mtp whitelist add|remove|list <指令>`、`/mtp status`、`/mtp reload`
 - Fabric 端包装指令节点 requires，Forge/NeoForge 端拦 CommandEvent，都没用 Mixin
 
 ## 配置

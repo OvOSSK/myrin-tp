@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.nio.file.Path;
 
 /**
- * Myrin TP（26.3 Fabric）：传送指令 + Only TP 指令限制。
+ * Myrin TP（26.3 Fabric）：传送指令 + 指令守卫。
  */
 public final class MyrinTPMod implements ModInitializer {
 
@@ -22,7 +22,7 @@ public final class MyrinTPMod implements ModInitializer {
     public static Config CONFIG;
     public static DataStore DATA;
     public static TpManager TP;
-    public static OnlyTP ONLY_TP;
+    public static TpGuard GUARD;
 
     private static CommandDispatcher<CommandSourceStack> dispatcher;
 
@@ -31,7 +31,8 @@ public final class MyrinTPMod implements ModInitializer {
         CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("myrintp");
         CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
         DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
-        ONLY_TP = new OnlyTP(CONFIG);
+        GUARD = new TpGuard(CONFIG);
+        SelectorUnlock.applied();
 
         CommandRegistrationCallback.EVENT.register((d, registryAccess, environment) -> {
             dispatcher = d;
@@ -40,7 +41,7 @@ public final class MyrinTPMod implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             TP = new TpManager(server, CONFIG, DATA);
-            OnlyTPNodeGuard.apply(dispatcher, ONLY_TP);
+            GuardNodes.apply(dispatcher, GUARD);
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {

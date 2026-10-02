@@ -11,17 +11,17 @@ import java.util.function.Predicate;
 /**
  * 指令树包装：
  * - 原版 tp/teleport 默认要求 OP 权限，这里放开给所有玩家，让生存无作弊也能用；
- * - 其余指令按 Only TP 规则收窄 requires。
+ * - 其余指令按守卫规则收窄 requires。
  * Brigadier 没提供公开的 requires 写入方法，用反射改字段；反射失败降级成不限制，不让服务端崩。
  */
-public final class OnlyTPNodeGuard {
+public final class GuardNodes {
 
-    private OnlyTPNodeGuard() {
+    private GuardNodes() {
     }
 
     private static boolean enabled = true;
 
-    public static void apply(CommandDispatcher<CommandSourceStack> dispatcher, OnlyTP onlyTP) {
+    public static void apply(CommandDispatcher<CommandSourceStack> dispatcher, TpGuard guard) {
         if (!enabled) {
             return;
         }
@@ -30,22 +30,22 @@ public final class OnlyTPNodeGuard {
             field.setAccessible(true);
             for (CommandNode<CommandSourceStack> node : new ArrayList<>(dispatcher.getRoot().getChildren())) {
                 String name = node.getName();
-                if (OnlyTP.MOD_COMMANDS.contains(name)) {
+                if (TpGuard.MOD_COMMANDS.contains(name)) {
                     continue;
                 }
-                if (OnlyTP.TP_COMMANDS.contains(name)) {
+                if (TpGuard.TP_COMMANDS.contains(name)) {
                     field.set(node, (Predicate<CommandSourceStack>) s -> true);
                     continue;
                 }
-                if (onlyTP.isWhitelisted(name)) {
+                if (guard.isWhitelisted(name)) {
                     continue;
                 }
                 Predicate<CommandSourceStack> base = node.getRequirement();
-                field.set(node, base.and(src -> onlyTP.allows(src, name)));
+                field.set(node, base.and(src -> guard.allows(src, name)));
             }
         } catch (Exception e) {
             enabled = false;
-            System.err.println("[myrintp] OnlyTP 指令限制启用失败（Brigadier 结构不兼容），已降级为不限制：" + e);
+            System.err.println("[myrintp] TpGuard 指令限制启用失败（Brigadier 结构不兼容），已降级为不限制：" + e);
         }
     }
 }

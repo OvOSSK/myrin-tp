@@ -19,7 +19,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import java.nio.file.Path;
 
 /**
- * Myrin TP（1.20.1 Forge）：传送指令 + Only TP 指令限制。
+ * Myrin TP（1.20.1 Forge）：传送指令 + 指令守卫。
  */
 @Mod(MyrinTPMod.MODID)
 public final class MyrinTPMod {
@@ -30,7 +30,7 @@ public final class MyrinTPMod {
     public static Config CONFIG;
     public static DataStore DATA;
     public static TpManager TP;
-    public static OnlyTP ONLY_TP;
+    public static TpGuard GUARD;
 
     private static CommandDispatcher<CommandSourceStack> dispatcher;
 
@@ -38,7 +38,7 @@ public final class MyrinTPMod {
         CONFIG_DIR = FMLPaths.CONFIGDIR.get().resolve("myrintp");
         CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
         DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
-        ONLY_TP = new OnlyTP(CONFIG);
+        GUARD = new TpGuard(CONFIG);
     }
 
     @Mod.EventBusSubscriber(modid = MODID)
@@ -53,7 +53,7 @@ public final class MyrinTPMod {
         @SubscribeEvent
         public static void onServerStarted(ServerStartedEvent event) {
             TP = new TpManager(event.getServer(), CONFIG, DATA);
-            OnlyTPNodeGuard.apply(dispatcher, ONLY_TP);
+            GuardNodes.apply(dispatcher, GUARD);
         }
 
         @SubscribeEvent
@@ -66,7 +66,7 @@ public final class MyrinTPMod {
 
         @SubscribeEvent
         public static void onCommand(CommandEvent event) {
-            if (event.isCanceled() || ONLY_TP == null) {
+            if (event.isCanceled() || GUARD == null) {
                 return;
             }
             ParseResults<CommandSourceStack> results = event.getParseResults();
@@ -79,10 +79,10 @@ public final class MyrinTPMod {
             }
             String name = nodes.get(0).getNode().getName();
             CommandSourceStack src = results.getContext().getSource();
-            if (!ONLY_TP.allows(src, name)) {
+            if (!GUARD.allows(src, name)) {
                 event.setCanceled(true);
                 if (src.getEntity() instanceof ServerPlayer p) {
-                    p.displayClientMessage(Component.literal("指令 /" + name + " 已被 Only TP 限制，仅可使用 TP 类指令。")
+                    p.displayClientMessage(Component.literal("指令 /" + name + " 已被指令守卫拦截，仅可使用 TP 类传送指令。")
                             .withStyle(ChatFormatting.RED), false);
                 }
             }

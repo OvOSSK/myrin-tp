@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Generate mod version
-        run: echo "MOD_VERSION=$(printf '%05d' $((RANDOM % 90000 + 10000)))" >> "$GITHUB_ENV"
+        run: echo "MOD_VERSION=$(date -u +%Y%m%d%H%M%S)" >> "$GITHUB_ENV"
 
       - name: Set up JDK
         uses: actions/setup-java@v4

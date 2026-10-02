@@ -6,14 +6,14 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Set;
 
 /**
- * Only TP 指令权限限制决策逻辑（无 Mixin、无作弊）：
+ * 指令守卫决策逻辑（无 Mixin、无作弊）：
  * <p>
  * mode 0 = 关闭
  * mode 1 = 非 OP 玩家仅可使用 TP 类指令（+ 模式一黑名单豁免），OP 不受限
  * mode 2 = OP 玩家仅可使用 TP 类指令（+ 模式二黑名单豁免 + 指令白名单）
  * mode 3 = 模式一、二同时生效
  */
-public final class OnlyTP {
+public final class TpGuard {
 
     /** TP 类指令（含原版 /tp /teleport 与模组传送指令），任何模式下都放行 */
     public static final Set<String> TP_COMMANDS = Set.of(
@@ -25,11 +25,11 @@ public final class OnlyTP {
     );
 
     /** 本模组管理指令，任何模式下都放行（由指令自身的 requires 控制权限） */
-    public static final Set<String> MOD_COMMANDS = Set.of("otp", "myrintp");
+    public static final Set<String> MOD_COMMANDS = Set.of("mtp", "myrintp");
 
     private final Config config;
 
-    public OnlyTP(Config config) {
+    public TpGuard(Config config) {
         this.config = config;
     }
 

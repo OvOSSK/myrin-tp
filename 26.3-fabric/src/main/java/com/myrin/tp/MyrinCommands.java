@@ -109,7 +109,7 @@ public final class MyrinCommands {
                 .then(Commands.argument("range", IntegerArgumentType.integer(16, 1000000))
                         .executes(c -> tp().tpr(c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "range")))));
 
-        d.register(Commands.literal("otp")
+        d.register(Commands.literal("mtp")
                 .requires(s -> hasPerm(s, MyrinTPMod.CONFIG.mode >= 2 ? 4 : 2))
                 .then(Commands.literal("mode")
                         .then(Commands.argument("mode", IntegerArgumentType.integer(0, 3))
@@ -164,7 +164,7 @@ public final class MyrinCommands {
     private static int setMode(CommandSourceStack src, int mode) {
         MyrinTPMod.CONFIG.mode = mode;
         MyrinTPMod.CONFIG.save(configFile());
-        reply(src, "已设置 Only TP 模式为 " + mode + "（0=关闭 1=非OP仅TP 2=OP仅TP 3=全部）。");
+        reply(src, "已设置指令守卫模式为 " + mode + "（0=关闭 1=非OP仅TP 2=OP仅TP 3=全部）。");
         return 1;
     }
 
@@ -228,7 +228,7 @@ public final class MyrinCommands {
     }
 
     private static int status(CommandSourceStack src) {
-        reply(src, "Only TP 模式：" + MyrinTPMod.CONFIG.mode);
+        reply(src, "指令守卫模式：" + MyrinTPMod.CONFIG.mode);
         reply(src, "传送套件：/tpa /tpahere /tpyes /tpno /tpcancel /tplist /sethome /home /homes /delhome /renamehome /back /tpr(/rtp)");
         reply(src, "配置目录：" + configFile().getParent().toString());
         return 1;

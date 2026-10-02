@@ -7,7 +7,7 @@ group = 'com.myrin'
 version = "${mod_version}"
 
 base {
-    archivesName = "myrintp-fabric"
+    archivesName = "26.3-fabric"
 }
 
 java {
