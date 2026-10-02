@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+group = 'com.myrin'
+version = "${mod_version}"
+
+base {
+    archivesName = "myrintp-neoforge"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+repositories {
+    mavenCentral()
+}
+
+neoForge {
+    version = "${neoforge_version}"
+    mods {
+        myrintp {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/mods.toml') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'     : "${mod_name}",
+                'Specification-Version'   : "${mod_version}",
+                'Implementation-Title'    : "${mod_name}",
+                'Implementation-Version'  : "${mod_version}",
+                'Implementation-Vendor'   : "${mod_author}"
+        ])
+    }
+}

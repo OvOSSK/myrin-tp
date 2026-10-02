@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+*/build/
+*/run/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 本地环境
+local.properties
+
+# 本地点缀文件
+/gradle-*/
+*/gradle-*/

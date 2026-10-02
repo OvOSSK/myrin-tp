@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "myrintp",
+  "version": "${version}",
+  "name": "Myrin TP",
+  "description": "传送 + 指令限制一体的服务端模组。不用开作弊就能用 /tpa /home /back /tpr 等传送指令，带安全落点检查；支持 Only TP 模式限制指令使用，可配黑名单和白名单。",
+  "authors": ["OvOSSK"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.myrin.tp.MyrinTPMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~26.3"
+  }
+}

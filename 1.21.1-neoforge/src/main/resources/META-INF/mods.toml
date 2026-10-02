@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[7,)"
+license="MIT"
+issueTrackerURL="https://github.com/OvOSSK/myrin-tp/issues"
+
+[[mods]]
+modId="myrintp"
+version="${version}"
+displayName="Myrin TP"
+logoFile="myrintp.png"
+credits="OvOSSK"
+authors="OvOSSK"
+description='''Myrin TP：传送 + 指令限制一体的服务端模组。
+
+普通玩家不用开作弊就能用 /tpa /tpahere /sethome /home /back /tpr 这些传送指令，
+传送带安全落点检查和倒计时（可移动取消），支持跨维度。
+
+服主可以开 Only TP 模式（0-3），限制非 OP 或 OP 只能用 TP 类指令，
+带黑名单和指令白名单，游戏内 /otp 直接配置。
+'''
+
+[[dependencies.myrintp]]
+modId="neoforge"
+mandatory=true
+versionRange="[21.1,)"
+ordering="NONE"
+side="BOTH"
