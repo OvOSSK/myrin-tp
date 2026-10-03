@@ -5,12 +5,10 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.DistExecutor;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -39,10 +37,7 @@ public final class MyrinTPMod {
         CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
         DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
         GUARD = new TpGuard(CONFIG);
-        if (FMLLoader.getDist() == Dist.CLIENT) {
-            ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class,
-                    () -> (container, parent) -> new MyrinConfigScreen(parent));
-        }
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> MyrinConfigClient::register);
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME)

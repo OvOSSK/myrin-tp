@@ -1,9 +1,21 @@
 package com.myrin.tp;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * 配置界面：参数行放在可滚动列表内，适配小分辨率与原版/钠界面缩放；
+ * 提示文字与保存/取消固定在底部，互不遮挡。
+ */
 public class MyrinConfigScreen extends Screen {
     private final Screen parent;
     private final Config cfg;
@@ -18,6 +30,8 @@ public class MyrinConfigScreen extends Screen {
     private int maxHomes;
     private boolean cancelOnMove;
     private boolean deathBack;
+
+    private ConfigList list;
 
     public MyrinConfigScreen(Screen parent) {
         super(Component.literal("Myrin TP 设置"));
@@ -47,60 +61,41 @@ public class MyrinConfigScreen extends Screen {
                     .bounds(bx, 34, 110, 20).build());
         }
 
-        int y = 70;
-        y = numRow("tpa 请求冷却(秒)", tpaCooldown, 5, y);
-        y = numRow("tpa 请求超时(秒)", tprTimeout, 5, y);
-        y = numRow("回家冷却(秒)", homeCooldown, 5, y);
-        y = numRow("返回冷却(秒)", backCooldown, 5, y);
-        y = numRow("随机传送冷却(秒)", tprCooldown, 5, y);
-        y = numRow("传送倒计时(刻)", delay, 5, y);
-        y = numRow("随机传送范围", tprRange, 500, y);
-        y = numRow("家点数量上限", maxHomes, 1, y);
-
-        addRenderableWidget(Button.builder(Component.literal("倒计时期间移动取消: " + onOff(cancelOnMove)),
-                b -> { cancelOnMove = !cancelOnMove; rebuild(); })
-                .bounds(x, y, 250, 20).build());
-        y += 28;
-        addRenderableWidget(Button.builder(Component.literal("/back 优先回死亡点: " + onOff(deathBack)),
-                b -> { deathBack = !deathBack; rebuild(); })
-                .bounds(x, y, 250, 20).build());
+        int listTop = 62;
+        int listBottom = this.height - 70;
+        if (listBottom < listTop + 60) {
+            listBottom = listTop + 60;
+        }
+        list = new ConfigList(Minecraft.getInstance(), 340, listBottom - listTop, listTop, listBottom, 24, this.width);
+        rebuildList();
+        addRenderableWidget(list);
 
         int by = this.height - 32;
         addRenderableWidget(Button.builder(Component.literal("保存"), b -> save()).bounds(x, by, 120, 20).build());
         addRenderableWidget(Button.builder(Component.literal("取消"), b -> onClose()).bounds(x + 132, by, 120, 20).build());
     }
 
-    private String onOff(boolean v) {
-        return v ? "开" : "关";
-    }
-
-    private int numRow(String label, int value, int step, int y) {
-        int x = this.width / 2 - 170;
-        addRenderableWidget(Button.builder(Component.literal("-" + step), b -> { setNum(label, value - step, step); })
-                .bounds(x, y, 40, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("+" + step), b -> { setNum(label, value + step, step); })
-                .bounds(x + 210, y, 40, 20).build());
-        return y + 26;
-    }
-
-    private void setNum(String label, int newVal, int step) {
-        if (newVal < 0) newVal = 0;
-        switch (label) {
-            case "tpa 请求冷却(秒)" -> tpaCooldown = newVal;
-            case "tpa 请求超时(秒)" -> tprTimeout = newVal;
-            case "回家冷却(秒)" -> homeCooldown = newVal;
-            case "返回冷却(秒)" -> backCooldown = newVal;
-            case "随机传送冷却(秒)" -> tprCooldown = newVal;
-            case "传送倒计时(刻)" -> delay = newVal;
-            case "随机传送范围" -> tprRange = newVal;
-            case "家点数量上限" -> maxHomes = newVal;
+    private void rebuildList() {
+        if (list == null) {
+            return;
         }
-        rebuild();
+        list.clearAll();
+        list.add(new NumEntry("tpa 请求冷却(秒)", tpaCooldown, 5, v -> tpaCooldown = v));
+        list.add(new NumEntry("tpa 请求超时(秒)", tprTimeout, 5, v -> tprTimeout = v));
+        list.add(new NumEntry("回家冷却(秒)", homeCooldown, 5, v -> homeCooldown = v));
+        list.add(new NumEntry("返回冷却(秒)", backCooldown, 5, v -> backCooldown = v));
+        list.add(new NumEntry("随机传送冷却(秒)", tprCooldown, 5, v -> tprCooldown = v));
+        list.add(new NumEntry("传送倒计时(刻)", delay, 5, v -> delay = v));
+        list.add(new NumEntry("随机传送范围", tprRange, 500, v -> tprRange = v));
+        list.add(new NumEntry("家点数量上限", maxHomes, 1, v -> maxHomes = v));
+        list.add(new ToggleEntry("倒计时期间移动取消", cancelOnMove, v -> cancelOnMove = v));
+        list.add(new ToggleEntry("/back 优先回死亡点", deathBack, v -> deathBack = v));
     }
 
     private void rebuild() {
-        clearWidgets();
-        init();
+        if (list != null) {
+            rebuildList();
+        }
     }
 
     private void save() {
@@ -120,24 +115,129 @@ public class MyrinConfigScreen extends Screen {
     }
 
     @Override
-    public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float pt) {
-        renderBackground(g, mx, my, pt);
+    public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
-        g.drawString(this.font, "tpa 请求冷却(秒): " + tpaCooldown, x + 46, 74, 0xFFAAAAAA);
-        g.drawString(this.font, "tpa 请求超时(秒): " + tprTimeout, x + 46, 100, 0xFFAAAAAA);
-        g.drawString(this.font, "回家冷却(秒): " + homeCooldown, x + 46, 126, 0xFFAAAAAA);
-        g.drawString(this.font, "返回冷却(秒): " + backCooldown, x + 46, 152, 0xFFAAAAAA);
-        g.drawString(this.font, "随机传送冷却(秒): " + tprCooldown, x + 46, 178, 0xFFAAAAAA);
-        g.drawString(this.font, "传送倒计时(刻): " + delay, x + 46, 204, 0xFFAAAAAA);
-        g.drawString(this.font, "随机传送范围: " + tprRange, x + 46, 230, 0xFFAAAAAA);
-        g.drawString(this.font, "家点数量上限: " + maxHomes, x + 46, 256, 0xFFAAAAAA);
-        g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 58, 0xFF888888);
+        g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 62, 0xFF888888);
         super.render(g, mx, my, pt);
     }
 
     @Override
     public void onClose() {
         this.minecraft.setScreen(parent);
+    }
+
+    /** 参数行：- 值标签 + */
+    private final class NumEntry extends ContainerObjectSelectionList.Entry<NumEntry> {
+        private final Button minus;
+        private final Button plus;
+        private final String label;
+        private int value;
+        private final Consumer<Integer> setter;
+
+        NumEntry(String label, int value, int step, Consumer<Integer> setter) {
+            this.label = label;
+            this.value = value;
+            this.setter = setter;
+            this.minus = Button.builder(Component.literal("-" + step), b -> change(-step)).bounds(0, 0, 40, 20).build();
+            this.plus = Button.builder(Component.literal("+" + step), b -> change(step)).bounds(0, 0, 40, 20).build();
+        }
+
+        private void change(int delta) {
+            int nv = Math.max(0, value + delta);
+            value = nv;
+            setter.accept(nv);
+            rebuildList();
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return List.of(minus, plus);
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return children().stream().filter(c -> c instanceof NarratableEntry).map(c -> (NarratableEntry) c).toList();
+        }
+
+        @Override
+        public void render(GuiGraphics g, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float pt) {
+            minus.setX(left);
+            minus.setY(top);
+            plus.setX(left + 210);
+            plus.setY(top);
+            minus.render(g, mouseX, mouseY, pt);
+            plus.render(g, mouseX, mouseY, pt);
+            g.drawString(font, label + ": " + value, left + 46, top + 6, 0xFFAAAAAA);
+        }
+    }
+
+    /** 开关行：点击切换 */
+    private final class ToggleEntry extends ContainerObjectSelectionList.Entry<ToggleEntry> {
+        private final Button toggle;
+        private final String label;
+        private boolean value;
+        private final Consumer<Boolean> setter;
+
+        ToggleEntry(String label, boolean value, Consumer<Boolean> setter) {
+            this.label = label;
+            this.value = value;
+            this.setter = setter;
+            this.toggle = Button.builder(Component.literal(label + ": " + (value ? "开" : "关")), b -> change()).bounds(0, 0, 250, 20).build();
+        }
+
+        private void change() {
+            value = !value;
+            setter.accept(value);
+            toggle.setMessage(Component.literal(label + ": " + (value ? "开" : "关")));
+            rebuildList();
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return List.of(toggle);
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return children().stream().filter(c -> c instanceof NarratableEntry).map(c -> (NarratableEntry) c).toList();
+        }
+
+        @Override
+        public void render(GuiGraphics g, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float pt) {
+            toggle.setX(left);
+            toggle.setY(top);
+            toggle.render(g, mouseX, mouseY, pt);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static final class ConfigList extends ContainerObjectSelectionList {
+        private final int screenWidth;
+
+        ConfigList(Minecraft mc, int width, int height, int y0, int y1, int itemHeight, int screenWidth) {
+            super(mc, width, height, y0, y1, itemHeight);
+            this.screenWidth = screenWidth;
+        }
+
+        @Override
+        public int getRowWidth() {
+            return 340;
+        }
+
+        @Override
+        protected int getScrollbarPosition() {
+            return this.screenWidth / 2 + 170 - 6;
+        }
+
+        public void clearAll() {
+            clearEntries();
+        }
+
+        @SuppressWarnings("unchecked")
+        public void add(ContainerObjectSelectionList.Entry e) {
+            addEntry(e);
+        }
     }
 }

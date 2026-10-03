@@ -12,8 +12,8 @@ import java.util.Set;
  * <p>
  * mode 0 = 不限制
  * mode 1 = 玩家仅可使用 TP 类指令（模式一黑名单豁免），管理员不受限
- * mode 2 = 管理员仅可使用 TP 类指令（模式二黑名单豁免 + 白名单）
- * mode 3 = 模式一、二同时生效
+ * mode 2 = 管理员仅可使用 TP 类指令（模式二黑名单豁免 + 白名单），普通玩家不受限
+ * mode 3 = 任何人仅可使用 TP 类指令（黑名单豁免）
  */
 public final class TpGuard {
 
@@ -40,7 +40,8 @@ public final class TpGuard {
     }
 
     /**
-     * 判断某指令对当前命令源是否放行。
+     * 判断某指令对当前命令源是否放行。requires 每次执行命令时都会重新求值，
+     * 因此游戏内修改配置后立即生效。
      */
     public boolean allows(CommandSourceStack src, String command) {
         int mode = config.mode;
@@ -50,13 +51,14 @@ public final class TpGuard {
         if (TP_COMMANDS.contains(command) || MOD_COMMANDS.contains(command)) {
             return true;
         }
-        // 白名单仅在模式二/三（管理员限制）生效
+        // 白名单仅在模式二/三（管理员受限）生效
         if ((mode == 2 || mode == 3) && config.whitelistMode2.contains(command)) {
             return true;
         }
-        int level = mode == 1 ? 2 : 4;
-        if (src.getEntity() instanceof ServerPlayer p) {
-            String name = p.getGameProfile().name();
+        // 黑名单豁免：命中名单的玩家不受对应模式限制
+        boolean isPlayer = src.getEntity() instanceof ServerPlayer;
+        if (isPlayer) {
+            String name = ((ServerPlayer) src.getEntity()).getGameProfile().name();
             if ((mode == 1 || mode == 3) && config.blacklistMode1.contains(name)) {
                 return true;
             }
@@ -64,7 +66,12 @@ public final class TpGuard {
                 return true;
             }
         }
-        Permission need = level >= 4 ? new Permission.HasCommandLevel(PermissionLevel.OWNERS) : new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS);
-        return src.permissions().hasPermission(need);
+        boolean isOp = src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS));
+        return switch (mode) {
+            case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
+            case 2 -> !isOp;   // 管理员仅TP：管理员只能 TP
+            case 3 -> false;   // 全部仅TP：任何人只能 TP
+            default -> true;
+        };
     }
 }

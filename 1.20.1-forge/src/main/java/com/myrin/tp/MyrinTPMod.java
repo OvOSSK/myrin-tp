@@ -3,13 +3,13 @@ package com.myrin.tp;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -36,10 +36,7 @@ public final class MyrinTPMod {
         CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
         DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
         GUARD = new TpGuard(CONFIG);
-        if (net.minecraftforge.fml.loading.FMLLoader.getDist() == net.minecraftforge.api.distmarker.Dist.CLIENT) {
-            ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-                    () -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> new MyrinConfigScreen(parent)));
-        }
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> MyrinConfigClient::register);
     }
 
     @Mod.EventBusSubscriber(modid = MODID)
