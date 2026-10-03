@@ -66,7 +66,7 @@ public class MyrinConfigScreen extends Screen {
         if (listBottom < listTop + 60) {
             listBottom = listTop + 60;
         }
-        list = new ConfigList(Minecraft.getInstance(), 340, listBottom - listTop, listTop, listBottom, 24, this.width);
+        list = new ConfigList(Minecraft.getInstance(), 340, listBottom - listTop, listTop, listBottom, this.width);
         rebuildList();
         addRenderableWidget(list);
 
@@ -116,7 +116,7 @@ public class MyrinConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        renderBackground(g);
+        renderBackground(g, mouseX, mouseY, partialTick);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
         g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 62, 0xFF888888);
@@ -216,8 +216,8 @@ public class MyrinConfigScreen extends Screen {
     private static final class ConfigList extends ContainerObjectSelectionList {
         private final int screenWidth;
 
-        ConfigList(Minecraft mc, int width, int height, int y0, int y1, int itemHeight, int screenWidth) {
-            super(mc, width, height, y0, y1, itemHeight);
+        ConfigList(Minecraft mc, int width, int height, int y0, int y1, int screenWidth) {
+            super(mc, width, height, y0, y1);
             this.screenWidth = screenWidth;
         }
 
