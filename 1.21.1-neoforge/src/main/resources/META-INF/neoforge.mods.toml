@@ -24,3 +24,6 @@ mandatory=true
 versionRange="[21.1,)"
 ordering="NONE"
 side="BOTH"
+
+[[mixins]]
+config="myrintp.mixins.json"
