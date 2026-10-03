@@ -3,7 +3,7 @@
   "id": "myrintp",
   "version": "${version}",
   "name": "Myrin TP",
-  "description": "传送与指令守卫模组：无需作弊即可使用传送指令，带安全落点检查、冷却与倒计时，支持跨维度；指令守卫可限制指令使用，支持黑名单与白名单。",
+  "description": "传送与指令管控模组：无需作弊即可使用传送指令，带安全落点检查、冷却与倒计时，支持跨维度；指令管控可限制指令使用，支持黑名单与白名单。",
   "authors": ["OvOSSK"],
   "license": "MIT",
   "environment": "*",

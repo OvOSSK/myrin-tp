@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.nio.file.Path;
 
 /**
- * Myrin TP（26.3 Fabric）：传送指令 + 指令守卫。
+ * Myrin TP（26.3 Fabric）：传送指令 + 指令管控。
  */
 public final class MyrinTPMod implements ModInitializer {
 

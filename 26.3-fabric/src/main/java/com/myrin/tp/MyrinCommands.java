@@ -164,7 +164,7 @@ public final class MyrinCommands {
     private static int setMode(CommandSourceStack src, int mode) {
         MyrinTPMod.CONFIG.mode = mode;
         MyrinTPMod.CONFIG.save(configFile());
-        reply(src, "已设置指令守卫模式为 " + mode + "（0=关闭 1=非OP仅TP 2=OP仅TP 3=全部）。");
+        reply(src, "已设置指令管控为 " + mode + "（0=不限制 1=玩家仅TP 2=管理员仅TP 3=全部仅TP）。");
         return 1;
     }
 
@@ -173,7 +173,7 @@ public final class MyrinCommands {
         if (!list.contains(name)) {
             list.add(name);
             saveConfig();
-            reply(src, "已将 " + name + " 加入" + (mode1 ? "模式一" : "模式二") + "黑名单（豁免对应模式的 TP 限制）。");
+            reply(src, "已将 " + name + " 加入" + (mode1 ? "模式一" : "模式二") + "黑名单（豁免玩家仅TP限制）。");
         } else {
             reply(src, name + " 已在" + (mode1 ? "模式一" : "模式二") + "黑名单中。");
         }
@@ -192,12 +192,12 @@ public final class MyrinCommands {
     }
 
     private static int blacklistList1(CommandSourceStack src) {
-        reply(src, "模式一黑名单（豁免非OP仅TP限制）：" + (MyrinTPMod.CONFIG.blacklistMode1.isEmpty() ? "（空）" : String.join(", ", MyrinTPMod.CONFIG.blacklistMode1)));
+        reply(src, "模式一黑名单（豁免玩家仅TP限制）：" + (MyrinTPMod.CONFIG.blacklistMode1.isEmpty() ? "（空）" : String.join(", ", MyrinTPMod.CONFIG.blacklistMode1)));
         return 1;
     }
 
     private static int blacklistList2(CommandSourceStack src) {
-        reply(src, "模式二黑名单（豁免OP仅TP限制）：" + (MyrinTPMod.CONFIG.blacklistMode2.isEmpty() ? "（空）" : String.join(", ", MyrinTPMod.CONFIG.blacklistMode2)));
+        reply(src, "模式二黑名单（豁免管理员仅TP限制）：" + (MyrinTPMod.CONFIG.blacklistMode2.isEmpty() ? "（空）" : String.join(", ", MyrinTPMod.CONFIG.blacklistMode2)));
         return 1;
     }
 
@@ -228,7 +228,7 @@ public final class MyrinCommands {
     }
 
     private static int status(CommandSourceStack src) {
-        reply(src, "指令守卫模式：" + MyrinTPMod.CONFIG.mode);
+        reply(src, "指令管控：" + MyrinTPMod.CONFIG.mode);
         reply(src, "传送套件：/tpa /tpahere /tpyes /tpno /tpcancel /tplist /sethome /home /homes /delhome /renamehome /back /tpr(/rtp)");
         reply(src, "配置目录：" + configFile().getParent().toString());
         return 1;

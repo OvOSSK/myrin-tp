@@ -19,7 +19,7 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import java.nio.file.Path;
 
 /**
- * Myrin TP（1.21.1 NeoForge）：传送指令 + 指令守卫。
+ * Myrin TP（1.21.1 NeoForge）：传送指令 + 指令管控。
  */
 @Mod(MyrinTPMod.MODID)
 public final class MyrinTPMod {

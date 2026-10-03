@@ -16,7 +16,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import java.nio.file.Path;
 
 /**
- * Myrin TP（1.20.1 Forge）：传送指令 + 指令守卫。
+ * Myrin TP（1.20.1 Forge）：传送指令 + 指令管控。
  */
 @Mod(MyrinTPMod.MODID)
 public final class MyrinTPMod {

@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 /**
  * 指令树包装：
  * - 原版 tp/teleport 默认要求 OP 权限，这里放开给所有玩家，让生存无作弊也能用；
- * - 其余指令按守卫规则收窄 requires。
+ * - 其余指令按管控规则收窄 requires。
  * Brigadier 没提供公开的 requires 写入方法，用反射改字段；反射失败降级成不限制，不让服务端崩。
  */
 public final class GuardNodes {

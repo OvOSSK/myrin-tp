@@ -20,7 +20,7 @@ public class MyrinConfigScreen extends Screen {
     private boolean deathBack;
 
     public MyrinConfigScreen(Screen parent) {
-        super(Component.literal("Myrin TP 配置"));
+        super(Component.literal("Myrin TP 设置"));
         this.parent = parent;
         this.cfg = MyrinTPMod.CONFIG;
         this.mode = cfg.mode;
@@ -41,27 +41,27 @@ public class MyrinConfigScreen extends Screen {
         int x = this.width / 2 - 170;
         for (int i = 0; i < 4; i++) {
             final int m = i;
-            int bx = x + i * 86;
-            addRenderableWidget(Button.builder(Component.literal("守卫模式 " + i + (mode == i ? " ✓" : "")),
+            int bx = x + i * 122;
+            addRenderableWidget(Button.builder(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")),
                     b -> { mode = m; rebuild(); })
-                    .bounds(bx, 34, 82, 20).build());
+                    .bounds(bx, 34, 110, 20).build());
         }
 
         int y = 70;
-        y = numRow("tpa 发送冷却(秒)", tpaCooldown, 5, y);
+        y = numRow("tpa 请求冷却(秒)", tpaCooldown, 5, y);
         y = numRow("tpa 请求超时(秒)", tprTimeout, 5, y);
-        y = numRow("home 冷却(秒)", homeCooldown, 5, y);
-        y = numRow("back 冷却(秒)", backCooldown, 5, y);
-        y = numRow("tpr 冷却(秒)", tprCooldown, 5, y);
-        y = numRow("传送倒计时(tick)", delay, 5, y);
-        y = numRow("tpr 范围", tprRange, 500, y);
-        y = numRow("最大家点数", maxHomes, 1, y);
+        y = numRow("回家冷却(秒)", homeCooldown, 5, y);
+        y = numRow("返回冷却(秒)", backCooldown, 5, y);
+        y = numRow("随机传送冷却(秒)", tprCooldown, 5, y);
+        y = numRow("传送倒计时(刻)", delay, 5, y);
+        y = numRow("随机传送范围", tprRange, 500, y);
+        y = numRow("家点数量上限", maxHomes, 1, y);
 
-        addRenderableWidget(Button.builder(Component.literal("倒计时移动取消: " + onOff(cancelOnMove)),
+        addRenderableWidget(Button.builder(Component.literal("倒计时期间移动取消: " + onOff(cancelOnMove)),
                 b -> { cancelOnMove = !cancelOnMove; rebuild(); })
                 .bounds(x, y, 250, 20).build());
         y += 28;
-        addRenderableWidget(Button.builder(Component.literal("back 优先死亡点: " + onOff(deathBack)),
+        addRenderableWidget(Button.builder(Component.literal("/back 优先回死亡点: " + onOff(deathBack)),
                 b -> { deathBack = !deathBack; rebuild(); })
                 .bounds(x, y, 250, 20).build());
 
@@ -86,14 +86,14 @@ public class MyrinConfigScreen extends Screen {
     private void setNum(String label, int newVal, int step) {
         if (newVal < 0) newVal = 0;
         switch (label) {
-            case "tpa 发送冷却(秒)" -> tpaCooldown = newVal;
+            case "tpa 请求冷却(秒)" -> tpaCooldown = newVal;
             case "tpa 请求超时(秒)" -> tprTimeout = newVal;
-            case "home 冷却(秒)" -> homeCooldown = newVal;
-            case "back 冷却(秒)" -> backCooldown = newVal;
-            case "tpr 冷却(秒)" -> tprCooldown = newVal;
-            case "传送倒计时(tick)" -> delay = newVal;
-            case "tpr 范围" -> tprRange = newVal;
-            case "最大家点数" -> maxHomes = newVal;
+            case "回家冷却(秒)" -> homeCooldown = newVal;
+            case "返回冷却(秒)" -> backCooldown = newVal;
+            case "随机传送冷却(秒)" -> tprCooldown = newVal;
+            case "传送倒计时(刻)" -> delay = newVal;
+            case "随机传送范围" -> tprRange = newVal;
+            case "家点数量上限" -> maxHomes = newVal;
         }
         rebuild();
     }
@@ -123,16 +123,16 @@ public class MyrinConfigScreen extends Screen {
     public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float pt) {
         renderBackground(g);
         int x = this.width / 2 - 170;
-        g.drawString(this.font, "守卫模式（0 关 / 1 黑名单 / 2 白名单 / 3 全限制）", x, 18, 0xFFFFFFFF);
-        g.drawString(this.font, "tpa 发送冷却(秒): " + tpaCooldown, x + 46, 74, 0xFFAAAAAA);
+        g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
+        g.drawString(this.font, "tpa 请求冷却(秒): " + tpaCooldown, x + 46, 74, 0xFFAAAAAA);
         g.drawString(this.font, "tpa 请求超时(秒): " + tprTimeout, x + 46, 100, 0xFFAAAAAA);
-        g.drawString(this.font, "home 冷却(秒): " + homeCooldown, x + 46, 126, 0xFFAAAAAA);
-        g.drawString(this.font, "back 冷却(秒): " + backCooldown, x + 46, 152, 0xFFAAAAAA);
-        g.drawString(this.font, "tpr 冷却(秒): " + tprCooldown, x + 46, 178, 0xFFAAAAAA);
-        g.drawString(this.font, "传送倒计时(tick): " + delay, x + 46, 204, 0xFFAAAAAA);
-        g.drawString(this.font, "tpr 范围: " + tprRange, x + 46, 230, 0xFFAAAAAA);
-        g.drawString(this.font, "最大家点数: " + maxHomes, x + 46, 256, 0xFFAAAAAA);
-        g.drawString(this.font, "保存后需重启生效；多人模式请改服务端配置。", x, this.height - 58, 0xFF888888);
+        g.drawString(this.font, "回家冷却(秒): " + homeCooldown, x + 46, 126, 0xFFAAAAAA);
+        g.drawString(this.font, "返回冷却(秒): " + backCooldown, x + 46, 152, 0xFFAAAAAA);
+        g.drawString(this.font, "随机传送冷却(秒): " + tprCooldown, x + 46, 178, 0xFFAAAAAA);
+        g.drawString(this.font, "传送倒计时(刻): " + delay, x + 46, 204, 0xFFAAAAAA);
+        g.drawString(this.font, "随机传送范围: " + tprRange, x + 46, 230, 0xFFAAAAAA);
+        g.drawString(this.font, "家点数量上限: " + maxHomes, x + 46, 256, 0xFFAAAAAA);
+        g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 58, 0xFF888888);
         super.render(g, mx, my, pt);
     }
 

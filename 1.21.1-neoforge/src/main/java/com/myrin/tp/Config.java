@@ -16,11 +16,11 @@ import java.util.List;
  */
 public final class Config {
 
-    /** 0=关闭 1=限制非OP仅TP类 2=限制OP仅TP类 3=两者同时 */
+    /** 0=不限制 1=玩家仅TP 2=管理员仅TP 3=全部仅TP */
     public int mode = 0;
-    /** 模式一黑名单：名单内玩家豁免"非OP仅TP类"限制（玩家名） */
+    /** 模式一黑名单：名单内玩家豁免"玩家仅TP"限制（玩家名） */
     public List<String> blacklistMode1 = new ArrayList<>();
-    /** 模式二黑名单：名单内玩家豁免"OP仅TP类"限制（玩家名） */
+    /** 模式二黑名单：名单内玩家豁免"管理员仅TP"限制（玩家名） */
     public List<String> blacklistMode2 = new ArrayList<>();
     /** 模式二指令白名单：默认放行基础指令 */
     public List<String> whitelistMode2 = defaultWhitelist();

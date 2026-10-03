@@ -8,11 +8,11 @@ import net.minecraft.server.permissions.PermissionLevel;
 import java.util.Set;
 
 /**
- * 指令守卫决策逻辑（无 Mixin、无作弊）：
+ * 指令管控决策逻辑（无 Mixin、无作弊）：
  * <p>
- * mode 0 = 关闭
- * mode 1 = 非 OP 玩家仅可使用 TP 类指令（+ 模式一黑名单豁免），OP 不受限
- * mode 2 = OP 玩家仅可使用 TP 类指令（+ 模式二黑名单豁免 + 指令白名单）
+ * mode 0 = 不限制
+ * mode 1 = 玩家仅可使用 TP 类指令（模式一黑名单豁免），管理员不受限
+ * mode 2 = 管理员仅可使用 TP 类指令（模式二黑名单豁免 + 白名单）
  * mode 3 = 模式一、二同时生效
  */
 public final class TpGuard {
@@ -50,7 +50,7 @@ public final class TpGuard {
         if (TP_COMMANDS.contains(command) || MOD_COMMANDS.contains(command)) {
             return true;
         }
-        // 指令白名单仅在模式二/三（OP 限制）生效
+        // 白名单仅在模式二/三（管理员限制）生效
         if ((mode == 2 || mode == 3) && config.whitelistMode2.contains(command)) {
             return true;
         }

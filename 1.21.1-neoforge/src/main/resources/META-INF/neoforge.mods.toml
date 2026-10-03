@@ -9,12 +9,12 @@ version="${version}"
 displayName="Myrin TP"
 credits="OvOSSK"
 authors="OvOSSK"
-description='''Myrin TP：传送与指令守卫模组。
+description='''Myrin TP：传送与指令管控模组。
 
 无需作弊即可使用传送指令（/tpa /home /back /tpr 等），
 带安全落点检查、冷却与倒计时，支持跨维度。
 
-指令守卫（0-3 模式）可限制非 OP 或 OP 仅使用 TP 类指令，
+指令管控（0-3 模式）可限制玩家或管理员仅使用 TP 类指令，
 支持黑名单与白名单，游戏内 /mtp 配置。
 '''
 
