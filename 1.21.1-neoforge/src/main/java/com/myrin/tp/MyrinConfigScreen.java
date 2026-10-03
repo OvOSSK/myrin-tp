@@ -131,7 +131,7 @@ public class MyrinConfigScreen extends Screen {
 
     @Override
     public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float pt) {
-        renderBackground(g);
+        renderBackground(g, mx, my, pt);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "守卫模式（0 关 / 1 黑名单 / 2 白名单 / 3 全限制）", x, 18, 0xFFFFFFFF);
         g.drawString(this.font, "tpa 发送冷却(秒): " + tpaCooldown, x + 46, 74, 0xFFAAAAAA);

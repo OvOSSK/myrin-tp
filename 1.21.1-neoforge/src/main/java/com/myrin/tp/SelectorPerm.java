@@ -57,7 +57,7 @@ public final class SelectorPerm {
 
         @Override
         public ResourceLocation getIdentifier() {
-            return new ResourceLocation("myrintp", "selector_permit");
+            return ResourceLocation.fromNamespaceAndPath("myrintp", "selector_permit");
         }
 
         @Override
