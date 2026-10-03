@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.myrin.tp.MyrinTPMod"]
+    "main": ["com.myrin.tp.MyrinTPMod"],
+    "modmenu": ["com.myrin.tp.MyrinModMenu"]
   },
   "depends": {
     "fabricloader": ">=0.16.0",
