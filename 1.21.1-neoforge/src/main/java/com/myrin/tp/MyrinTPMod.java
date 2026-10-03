@@ -47,7 +47,7 @@ public final class MyrinTPMod {
         GUARD = new TpGuard(CONFIG);
         if (FMLLoader.getDist() == Dist.CLIENT) {
             ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class,
-                    () -> (container, parent) -> new MyrinConfigScreen(parent));
+                    (container, parent) -> new MyrinConfigScreen(parent));
         }
     }
 
