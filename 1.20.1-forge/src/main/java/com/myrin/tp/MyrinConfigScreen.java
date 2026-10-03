@@ -4,9 +4,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyrinConfigScreen extends Screen {
     private final Screen parent;
     private final Config cfg;
@@ -21,13 +18,6 @@ public class MyrinConfigScreen extends Screen {
     private int maxHomes;
     private boolean cancelOnMove;
     private boolean deathBack;
-
-    private static final class Num {
-        int v;
-        Num(int v) { this.v = v; }
-    }
-
-    private final List<Runnable> refresh = new ArrayList<>();
 
     public MyrinConfigScreen(Screen parent) {
         super(Component.literal("Myrin TP 配置"));

@@ -13,11 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * 选择器权限点内置放行。
- * 原版与 NeoForge 要求 OP2（GAMEMASTERS）才能使用 @s/@p/@a 等目标选择器，
- * 而选择器权限的检查发生在命令解析阶段，普通玩家在生存无作弊下会被直接拦下。
- * 本类把 neoforge:use_entity_selectors 这个权限点的查询结果固定为放行，
- * 让解析阶段的选择器检查直接通过，其余权限节点全部保持原样，不产生任何越权。
+ * 选择器权限点内置放行：对选择器权限点恒返回 true，其余权限节点保持原样。
  */
 public final class SelectorPerm {
 
@@ -27,10 +23,7 @@ public final class SelectorPerm {
     private SelectorPerm() {
     }
 
-    /**
-     * 服务端启动完成后调用一次：把当前权限处理器包一层，仅对选择器节点恒放行。
-     * 通过反射替换 PermissionAPI 的活动处理器，不修改任何配置文件。
-     */
+    /** 包一层权限处理器，仅对选择器节点恒放行。 */
     public static synchronized void inject() {
         if (injected) {
             return;

@@ -10,23 +10,14 @@ import java.lang.reflect.Modifier;
 
 /**
  * 放开目标选择器权限。
- * 原版 @e/@a/@p/@r 这类选择器要求 GAMEMASTERS 级（commands/entity_selectors 权限），
- * 本类做两处调整：服务端把该权限常量降为 ALL（普通玩家带选择器执行 /tp 等也能通过），
+ * 服务端把 commands/entity_selectors 权限常量降为 ALL（普通玩家带选择器执行 /tp 等也能通过），
  * 客户端把恒返回 false 的 NO_PERMISSIONS 换成 ALL_PERMISSIONS（客户端解析与补全不拦截）。
- * 服务端其余命令权限不受影响；失败则保持原版限制。
- *
- * 注意：Fabric 重映射后字段名是中间名，反射 getDeclaredField("字段名") 的字符串不会被重映射，
- * 因此这里按字段值识别目标字段，而不是按名字查找。
+ * 其余权限不受影响；失败则保持原版限制。
+ * 注意：Fabric 重映射后字段名是中间名，反射按名字查找会失败，这里按字段值识别。
  */
 public final class SelectorUnlock {
 
-    private static boolean applied = false;
-
     private SelectorUnlock() {
-    }
-
-    public static boolean applied() {
-        return applied;
     }
 
     private static final sun.misc.Unsafe UNSAFE = unsafe();
@@ -46,13 +37,13 @@ public final class SelectorUnlock {
         UNSAFE.putObject(UNSAFE.staticFieldBase(f), UNSAFE.staticFieldOffset(f), value);
     }
 
-    static {
+    /** 服务端与客户端各调整一处选择器权限，调用一次即可。 */
+    public static void init() {
         try {
             if (UNSAFE == null) {
                 throw new IllegalStateException("Unsafe 不可用");
             }
-            // 1) 服务端：找到命令选择器权限字段（值形如 Atom(id=...commands/entity_selectors)），
-            //    把常量换成无等级要求的 ALL，让 LevelBasedPermissionSet 对普通玩家放行选择器。
+            // 服务端：把 commands/entity_selectors 权限常量换成无等级要求的 ALL
             boolean foundSelector = false;
             for (Field f : Permissions.class.getDeclaredFields()) {
                 if (!Modifier.isStatic(f.getModifiers()) || !Permission.class.isAssignableFrom(f.getType())) {
@@ -69,9 +60,7 @@ public final class SelectorUnlock {
                     }
                 }
             }
-            // 2) 客户端：把恒返回 false 的 NO_PERMISSIONS 换成 ALL_PERMISSIONS。
-            //    按行为识别：对任意权限都返回 false 的静态集合就是 NO_PERMISSIONS。
-            boolean foundNoPerms = false;
+            // 客户端：把恒返回 false 的 NO_PERMISSIONS 换成 ALL_PERMISSIONS
             for (Field f : PermissionSet.class.getDeclaredFields()) {
                 if (!Modifier.isStatic(f.getModifiers()) || !PermissionSet.class.isAssignableFrom(f.getType())) {
                     continue;
@@ -83,7 +72,6 @@ public final class SelectorUnlock {
                         if (!set.hasPermission(Permissions.COMMANDS_ENTITY_SELECTORS)
                                 && !set.hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
                             writeStatic(f, PermissionSet.ALL_PERMISSIONS);
-                            foundNoPerms = true;
                             break;
                         }
                     } catch (Exception ignored) {
@@ -91,7 +79,6 @@ public final class SelectorUnlock {
                     }
                 }
             }
-            applied = foundSelector || foundNoPerms;
             if (!foundSelector) {
                 System.err.println("[myrintp] 未找到选择器权限字段，服务端选择器保持原版限制");
             }

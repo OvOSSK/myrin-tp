@@ -9,13 +9,13 @@ version="${version}"
 displayName="Myrin TP"
 credits="OvOSSK"
 authors="OvOSSK"
-description='''Myrin TP：传送 + 指令限制一体的服务端模组。
+description='''Myrin TP：传送与指令守卫模组。
 
-普通玩家不用开作弊就能用 /tpa /tpahere /sethome /home /back /tpr 这些传送指令，
-传送带安全落点检查和倒计时（可移动取消），支持跨维度。
+无需作弊即可使用传送指令（/tpa /home /back /tpr 等），
+带安全落点检查、冷却与倒计时，支持跨维度。
 
-服主可以开指令守卫（0-3 模式），限制非 OP 或 OP 只能用 TP 类指令，
-带黑名单和指令白名单，游戏内 /mtp 直接配置。
+指令守卫（0-3 模式）可限制非 OP 或 OP 仅使用 TP 类指令，
+支持黑名单与白名单，游戏内 /mtp 配置。
 '''
 
 [[dependencies.myrintp]]

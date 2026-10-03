@@ -3,7 +3,7 @@
   "id": "myrintp",
   "version": "${version}",
   "name": "Myrin TP",
-  "description": "传送 + 指令限制一体的服务端模组。不用开作弊就能用 /tpa /home /back /tpr 等传送指令，带安全落点检查；支持指令守卫模式限制指令使用，可配黑名单和白名单。",
+  "description": "传送与指令守卫模组：无需作弊即可使用传送指令，带安全落点检查、冷却与倒计时，支持跨维度；指令守卫可限制指令使用，支持黑名单与白名单。",
   "authors": ["OvOSSK"],
   "license": "MIT",
   "environment": "*",

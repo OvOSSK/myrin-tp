@@ -32,7 +32,7 @@ public final class MyrinTPMod implements ModInitializer {
         CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
         DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
         GUARD = new TpGuard(CONFIG);
-        SelectorUnlock.applied();
+        SelectorUnlock.init();
 
         CommandRegistrationCallback.EVENT.register((d, registryAccess, environment) -> {
             dispatcher = d;

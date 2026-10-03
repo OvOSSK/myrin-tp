@@ -34,7 +34,7 @@ Minecraft 服务端的传送 + 指令限制可配置模组。纯服务端逻辑�
 - 模式一、二各有独立黑名单，名单内玩家在对应模式豁免
 - 模式二带指令白名单，默认放行 seed/msg/tell/w/help/list/me
 - 游戏内配置：`/mtp mode <0-3>`、`/mtp blacklist1|blacklist2 add|remove|list <玩家>`、`/mtp whitelist add|remove|list <指令>`、`/mtp status`、`/mtp reload`
-- Fabric 端包装指令节点 requires，Forge/NeoForge 端拦 CommandEvent，都没用 Mixin
+- 三端统一包装指令节点 requires，没用 Mixin
 
 ## 配置
 

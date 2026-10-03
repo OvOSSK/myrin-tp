@@ -1,14 +1,9 @@
 package com.myrin.tp;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.ParseResults;
-import com.mojang.brigadier.context.ParsedCommandNode;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -69,30 +64,6 @@ public final class MyrinTPMod {
                 TP.shutdown();
             }
             DATA.save(CONFIG_DIR.resolve("data.json"));
-        }
-
-        @SubscribeEvent
-        public static void onCommand(CommandEvent event) {
-            if (event.isCanceled() || GUARD == null) {
-                return;
-            }
-            ParseResults<CommandSourceStack> results = event.getParseResults();
-            if (results == null || results.getContext() == null) {
-                return;
-            }
-            java.util.List<ParsedCommandNode<CommandSourceStack>> nodes = results.getContext().getNodes();
-            if (nodes.isEmpty()) {
-                return;
-            }
-            String name = nodes.get(0).getNode().getName();
-            CommandSourceStack src = results.getContext().getSource();
-            if (!GUARD.allows(src, name)) {
-                event.setCanceled(true);
-                if (src.getEntity() instanceof ServerPlayer p) {
-                    p.displayClientMessage(Component.literal("指令 /" + name + " 已被指令守卫拦截，仅可使用 TP 类传送指令。")
-                            .withStyle(ChatFormatting.RED), false);
-                }
-            }
         }
 
         @SubscribeEvent

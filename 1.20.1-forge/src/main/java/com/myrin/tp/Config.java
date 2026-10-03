@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 配置文件（JSON），字段都有默认值。
- * 全部字段带默认值，缺失字段自动补默认值。
+ * 配置文件（JSON），缺失字段自动补默认值。
  */
 public final class Config {
 
