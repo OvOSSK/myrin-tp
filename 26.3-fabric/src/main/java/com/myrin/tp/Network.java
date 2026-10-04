@@ -14,8 +14,8 @@ public final class Network {
     }
 
     public static void register() {
-        PayloadTypeRegistry.playC2S().register(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(ConfigStatusPacket.TYPE, ConfigStatusPacket.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(ConfigStatusPacket.TYPE, ConfigStatusPacket.STREAM_CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(ConfigSyncPacket.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();

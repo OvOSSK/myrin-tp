@@ -98,7 +98,7 @@ public final class MyrinTPMod {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, (pkt, ctx) -> {
             ctx.enqueueWork(() -> {
-                ServerPlayer player = ctx.getSender();
+                ServerPlayer player = (ServerPlayer) ctx.player();
                 if (player != null) {
                     onConfigSync(player, pkt.kind(), pkt.json());
                 }

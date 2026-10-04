@@ -2,6 +2,8 @@ package com.myrin.tp;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
+
+import java.util.Optional;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -22,9 +24,9 @@ public final class Network {
     public static void register() {
         CHANNEL.registerMessage(0, ConfigSyncPacket.class,
                 ConfigSyncPacket::encode, ConfigSyncPacket::decode, ConfigSyncPacket::handle,
-                NetworkDirection.PLAY_TO_SERVER);
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
         CHANNEL.registerMessage(1, ConfigStatusPacket.class,
                 ConfigStatusPacket::encode, ConfigStatusPacket::decode, ConfigStatusPacket::handle,
-                NetworkDirection.PLAY_TO_CLIENT);
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }

@@ -66,7 +66,7 @@ public final class MyrinTPMod implements ModInitializer {
 
     /** 服务端：处理客户端配置同步请求（0=查询，1=提交）。OP 判定以服务端为准（26.3 权限集）。 */
     public static void onConfigSync(ServerPlayer player, int type, String json) {
-        boolean op = player.getServer() != null && player.getServer().getPlayerList().isOp(player.nameAndId());
+        boolean op = player.level().getServer() != null && player.level().getServer().getPlayerList().isOp(player.nameAndId());
         if (type == 0) {
             sendConfigStatus(player, op);
             return;
@@ -82,8 +82,8 @@ public final class MyrinTPMod implements ModInitializer {
         Config n = Config.fromJson(json);
         CONFIG.copyFrom(n);
         CONFIG.save(CONFIG_FILE);
-        for (ServerPlayer p : player.server.getPlayerList().getPlayers()) {
-            sendConfigStatus(p, p.getServer() != null && p.getServer().getPlayerList().isOp(p.nameAndId()));
+        for (ServerPlayer p : player.level().getServer().getPlayerList().getPlayers()) {
+            sendConfigStatus(p, p.level().getServer() != null && p.level().getServer().getPlayerList().isOp(p.nameAndId()));
         }
     }
 
