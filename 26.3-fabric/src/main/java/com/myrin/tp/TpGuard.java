@@ -71,7 +71,7 @@ public final class TpGuard {
                 || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS))
                 || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS));
         if (!isOp && src.getEntity() instanceof ServerPlayer p) {
-            isOp = p.getServer().getPlayerList().isOp(p.nameAndId());
+            isOp = src.getServer().getPlayerList().isOp(p.nameAndId());
         }
         return switch (mode) {
             case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
