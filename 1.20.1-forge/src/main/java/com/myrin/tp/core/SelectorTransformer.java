@@ -49,11 +49,8 @@ public class SelectorTransformer implements ITransformer<ClassNode> {
     @Override
     public Set<Target> targets() {
         return Set.of(
-                Target.targetMethod("net.minecraft.commands.arguments.selector.EntitySelector",
-                        "m_121168_", "(Lnet/minecraft/commands/CommandSourceStack;)V"),
-                Target.targetMethod("net.minecraft.commands.arguments.EntityArgument",
-                        "listSuggestions",
-                        "(Lcom/mojang/brigadier/context/CommandContext;Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)Ljava/util/concurrent/CompletableFuture;")
+                Target.targetClass("net.minecraft.commands.arguments.selector.EntitySelector"),
+                Target.targetClass("net.minecraft.commands.arguments.EntityArgument")
         );
     }
 }
