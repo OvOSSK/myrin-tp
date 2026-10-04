@@ -4,7 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.api.distmarker.Dist;
@@ -90,56 +89,8 @@ public final class MyrinTPMod {
         }
     }
 
-    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
-    public static final class ModBus {
-
-        @SubscribeEvent
-        public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToServer(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, (pkt, ctx) -> {
-            ctx.enqueueWork(() -> {
-                ServerPlayer player = (ServerPlayer) ctx.player();
-                if (player != null) {
-                    onConfigSync(player, pkt.kind(), pkt.json());
-                }
-            });
-        });
-        registrar.playToClient(ConfigStatusPacket.TYPE, ConfigStatusPacket.STREAM_CODEC, (pkt, ctx) -> {
-            ctx.enqueueWork(() -> {
-                MyrinConfigScreen screen = MyrinConfigScreen.active;
-                if (screen != null) {
-                    screen.onConfigStatus(pkt.canEdit(), pkt.json());
-                }
-            });
-        });
-        }
-    }
 
     /** 服务端：处理客户端配置同步请求（0=查询，1=提交）。OP 判定以服务端为准。 */
-    public static void onConfigSync(ServerPlayer player, int type, String json) {
-        boolean op = player.hasPermissions(2) || player.hasPermissions(3) || player.hasPermissions(4);
-        if (type == 0) {
-            sendConfigStatus(player, op);
-            return;
-        }
-        if (type != 1) {
-            return;
-        }
-        if (!op) {
-            player.sendSystemMessage(Component.literal("你没有权限执行此指令！请联系服务器管理员处理！"));
-            sendConfigStatus(player, false);
-            return;
-        }
-        Config n = Config.fromJson(json);
-        CONFIG.copyFrom(n);
-        CONFIG.save(CONFIG_FILE);
-        for (ServerPlayer p : player.server.getPlayerList().getPlayers()) {
-            sendConfigStatus(p, p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4));
-        }
-    }
 
-    private static void sendConfigStatus(ServerPlayer player, boolean op) {
-        PacketDistributor.sendToPlayer(player, new ConfigStatusPacket(op, CONFIG.toJsonString()));
-    }
 }
 

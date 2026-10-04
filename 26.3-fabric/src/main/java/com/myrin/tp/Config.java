@@ -135,9 +135,6 @@ public final class Config {
         this.deathBack = other.deathBack;
     }
 
-    public String toJsonString() {
-        return GSON.toJson(toJson());
-    }
 
     public JsonObject toJson() {
         JsonObject o = new JsonObject();
