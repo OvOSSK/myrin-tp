@@ -4,7 +4,8 @@
   "package": "com.myrin.tp.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CommonHooksMixin"
+    "CommonHooksMixin",
+    "EntitySelectorParserMixin"
   ],
   "injectors": {
     "defaultRequire": 1

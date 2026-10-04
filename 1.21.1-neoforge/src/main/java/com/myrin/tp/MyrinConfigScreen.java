@@ -57,7 +57,7 @@ public class MyrinConfigScreen extends Screen {
             final int m = i;
             int bx = x + i * 122;
             addRenderableWidget(Button.builder(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")),
-                    b -> { mode = m; rebuild(); })
+                    b -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); rebuild(); })
                     .bounds(bx, 34, 110, 20).build());
         }
 
@@ -119,7 +119,7 @@ public class MyrinConfigScreen extends Screen {
         renderBackground(g, mx, my, pt);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
-        g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 62, 0xFF888888);
+        g.drawString(this.font, "模式点击立即生效；参数修改后点保存生效（多人请由服主设置）。", x, this.height - 62, 0xFFAAAAAA);
         super.render(g, mx, my, pt);
     }
 
@@ -169,7 +169,7 @@ public class MyrinConfigScreen extends Screen {
             plus.setY(top);
             minus.render(g, mouseX, mouseY, pt);
             plus.render(g, mouseX, mouseY, pt);
-            g.drawString(font, label + ": " + value, left + 46, top + 6, 0xFFAAAAAA);
+            g.drawString(font, label + ": " + value, left + 46, top + 6, 0xFFFFFFFF);
         }
     }
 
