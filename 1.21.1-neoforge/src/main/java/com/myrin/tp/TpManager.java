@@ -347,16 +347,19 @@ public final class TpManager {
     }
 
 
-    public int tpr(ServerPlayer p, Integer rangeArg) {
+    public int tpr(ServerPlayer p) {
         if (!cooldownCheck(p, "tpr", config.tprCooldownSeconds)) {
             return 1;
         }
-        int range = rangeArg != null ? rangeArg : config.tprRange;
         ServerLevel target = (config.tprDimension == null || config.tprDimension.isEmpty())
                 ? (ServerLevel) p.level()
                 : SafeTeleport.levelByKey(server, config.tprDimension);
         BlockPos center = new BlockPos((int) p.getX(), (int) p.getY(), (int) p.getZ());
-        BlockPos pos = SafeTeleport.randomSafe(target, center, range, Math.max(50, config.tprAttempts));
+        BlockPos pos = SafeTeleport.randomSafe(target, center, config.tprRange, Math.max(50, config.tprAttempts));
+        if (pos.distSqr(center) < 25) {
+            err(p, "随机传送失败：未找到安全落点，请在配置中缩小「随机传送范围」。");
+            return 1;
+        }
         teleportWithDelay(p, target, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, p.getYRot(), p.getXRot());
         ok(p, "正在随机传送……");
         return 1;

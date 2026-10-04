@@ -97,15 +97,11 @@ public final class MyrinCommands {
 
         d.register(Commands.literal("tpr")
                 .requires(s -> s.getEntity() instanceof ServerPlayer)
-                .executes(c -> tp().tpr(c.getSource().getPlayerOrException(), null))
-                .then(Commands.argument("range", IntegerArgumentType.integer(16, 1000000))
-                        .executes(c -> tp().tpr(c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "range")))));
+                .executes(c -> tp().tpr(c.getSource().getPlayerOrException())));
 
         d.register(Commands.literal("rtp")
                 .requires(s -> s.getEntity() instanceof ServerPlayer)
-                .executes(c -> tp().tpr(c.getSource().getPlayerOrException(), null))
-                .then(Commands.argument("range", IntegerArgumentType.integer(16, 1000000))
-                        .executes(c -> tp().tpr(c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "range")))));
+                .executes(c -> tp().tpr(c.getSource().getPlayerOrException())));
 
         d.register(Commands.literal("mtp")
                 .requires(s -> s.hasPermission(MyrinTPMod.CONFIG.mode >= 2 ? 4 : 2))
