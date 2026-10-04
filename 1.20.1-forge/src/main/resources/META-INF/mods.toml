@@ -10,6 +10,7 @@ version="${version}"
 displayName="Myrin TP"
 credits="OvOSSK"
 authors="OvOSSK"
+logoFile="myrintp.png"
 description='''Myrin TP：传送与指令管控模组。
 
 无需作弊即可使用传送指令（/tpa /home /back /tpr 等），

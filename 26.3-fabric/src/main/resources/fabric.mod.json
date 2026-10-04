@@ -24,5 +24,6 @@
   },
   "mixins": [
     "myrintp.mixins.json"
-  ]
+  ],
+  "icon": "myrintp.png"
 }
