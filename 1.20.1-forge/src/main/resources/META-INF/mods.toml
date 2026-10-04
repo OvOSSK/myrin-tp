@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[47,)"
 license="MIT"
+mixinConfigs=["myrintp.mixins.json"]
 issueTrackerURL="https://github.com/OvOSSK/myrin-tp/issues"
 
 [[mods]]

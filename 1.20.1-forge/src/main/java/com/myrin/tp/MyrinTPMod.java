@@ -60,7 +60,6 @@ public final class MyrinTPMod {
         public static void onServerStarted(ServerStartedEvent event) {
             TP = new TpManager(event.getServer(), CONFIG, DATA);
             GuardNodes.apply(dispatcher);
-            SelectorPerm.inject();
         }
 
         @SubscribeEvent
