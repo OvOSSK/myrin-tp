@@ -55,32 +55,45 @@ public final class Config {
     }
 
     public static Config load(Path file) {
-        Config cfg = new Config();
         if (Files.exists(file)) {
             try {
-                String json = Files.readString(file, StandardCharsets.UTF_8);
-                JsonObject obj = GSON.fromJson(json, JsonObject.class);
-                if (obj != null) {
-                    if (obj.has("mode")) cfg.mode = obj.get("mode").getAsInt();
-                    if (obj.has("blacklistMode1")) cfg.blacklistMode1 = strList(obj.getAsJsonArray("blacklistMode1"));
-                    if (obj.has("blacklistMode2")) cfg.blacklistMode2 = strList(obj.getAsJsonArray("blacklistMode2"));
-                    if (obj.has("whitelistMode2")) cfg.whitelistMode2 = strList(obj.getAsJsonArray("whitelistMode2"));
-                    if (obj.has("tpaRequestCooldownSeconds")) cfg.tpaRequestCooldownSeconds = obj.get("tpaRequestCooldownSeconds").getAsInt();
-                    if (obj.has("tpaRequestTimeoutSeconds")) cfg.tpaRequestTimeoutSeconds = obj.get("tpaRequestTimeoutSeconds").getAsInt();
-                    if (obj.has("homeCooldownSeconds")) cfg.homeCooldownSeconds = obj.get("homeCooldownSeconds").getAsInt();
-                    if (obj.has("backCooldownSeconds")) cfg.backCooldownSeconds = obj.get("backCooldownSeconds").getAsInt();
-                    if (obj.has("tprCooldownSeconds")) cfg.tprCooldownSeconds = obj.get("tprCooldownSeconds").getAsInt();
-                    if (obj.has("teleportDelayTicks")) cfg.teleportDelayTicks = obj.get("teleportDelayTicks").getAsInt();
-                    if (obj.has("cancelOnMove")) cfg.cancelOnMove = obj.get("cancelOnMove").getAsBoolean();
-                    if (obj.has("tprRange")) cfg.tprRange = obj.get("tprRange").getAsInt();
-                    if (obj.has("tprAttempts")) cfg.tprAttempts = obj.get("tprAttempts").getAsInt();
-                    if (obj.has("tprDimension")) cfg.tprDimension = obj.get("tprDimension").getAsString();
-                    if (obj.has("maxHomes")) cfg.maxHomes = obj.get("maxHomes").getAsInt();
-                    if (obj.has("deathBack")) cfg.deathBack = obj.get("deathBack").getAsBoolean();
-                }
+                return fromJson(Files.readString(file, StandardCharsets.UTF_8));
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        return new Config();
+    }
+
+    /** 从 JSON 字符串解析配置，失败时返回默认配置。 */
+    public static Config fromJson(String json) {
+        Config cfg = new Config();
+        if (json == null || json.isEmpty()) {
+            return cfg;
+        }
+        try {
+            JsonObject obj = GSON.fromJson(json, JsonObject.class);
+            if (obj == null) {
+                return cfg;
+            }
+            if (obj.has("mode")) cfg.mode = obj.get("mode").getAsInt();
+            if (obj.has("blacklistMode1")) cfg.blacklistMode1 = strList(obj.getAsJsonArray("blacklistMode1"));
+            if (obj.has("blacklistMode2")) cfg.blacklistMode2 = strList(obj.getAsJsonArray("blacklistMode2"));
+            if (obj.has("whitelistMode2")) cfg.whitelistMode2 = strList(obj.getAsJsonArray("whitelistMode2"));
+            if (obj.has("tpaRequestCooldownSeconds")) cfg.tpaRequestCooldownSeconds = obj.get("tpaRequestCooldownSeconds").getAsInt();
+            if (obj.has("tpaRequestTimeoutSeconds")) cfg.tpaRequestTimeoutSeconds = obj.get("tpaRequestTimeoutSeconds").getAsInt();
+            if (obj.has("homeCooldownSeconds")) cfg.homeCooldownSeconds = obj.get("homeCooldownSeconds").getAsInt();
+            if (obj.has("backCooldownSeconds")) cfg.backCooldownSeconds = obj.get("backCooldownSeconds").getAsInt();
+            if (obj.has("tprCooldownSeconds")) cfg.tprCooldownSeconds = obj.get("tprCooldownSeconds").getAsInt();
+            if (obj.has("teleportDelayTicks")) cfg.teleportDelayTicks = obj.get("teleportDelayTicks").getAsInt();
+            if (obj.has("cancelOnMove")) cfg.cancelOnMove = obj.get("cancelOnMove").getAsBoolean();
+            if (obj.has("tprRange")) cfg.tprRange = obj.get("tprRange").getAsInt();
+            if (obj.has("tprAttempts")) cfg.tprAttempts = obj.get("tprAttempts").getAsInt();
+            if (obj.has("tprDimension")) cfg.tprDimension = obj.get("tprDimension").getAsString();
+            if (obj.has("maxHomes")) cfg.maxHomes = obj.get("maxHomes").getAsInt();
+            if (obj.has("deathBack")) cfg.deathBack = obj.get("deathBack").getAsBoolean();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return cfg;
     }
@@ -102,7 +115,31 @@ public final class Config {
         }
     }
 
-    private JsonObject toJson() {
+    /** 将另一配置的全部字段复制到本对象（保持引用不变，所有持有者立即生效）。 */
+    public void copyFrom(Config other) {
+        this.mode = other.mode;
+        this.blacklistMode1 = other.blacklistMode1;
+        this.blacklistMode2 = other.blacklistMode2;
+        this.whitelistMode2 = other.whitelistMode2;
+        this.tpaRequestCooldownSeconds = other.tpaRequestCooldownSeconds;
+        this.tpaRequestTimeoutSeconds = other.tpaRequestTimeoutSeconds;
+        this.homeCooldownSeconds = other.homeCooldownSeconds;
+        this.backCooldownSeconds = other.backCooldownSeconds;
+        this.tprCooldownSeconds = other.tprCooldownSeconds;
+        this.teleportDelayTicks = other.teleportDelayTicks;
+        this.cancelOnMove = other.cancelOnMove;
+        this.tprRange = other.tprRange;
+        this.tprAttempts = other.tprAttempts;
+        this.tprDimension = other.tprDimension;
+        this.maxHomes = other.maxHomes;
+        this.deathBack = other.deathBack;
+    }
+
+    public String toJsonString() {
+        return GSON.toJson(toJson());
+    }
+
+    public JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("mode", mode);
         o.add("blacklistMode1", GSON.toJsonTree(blacklistMode1));

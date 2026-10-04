@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.nio.file.Path;
@@ -36,6 +37,7 @@ public final class MyrinTPMod implements ModInitializer {
         CONFIG = Config.load(CONFIG_FILE);
         DATA = DataStore.load(DATA_FILE);
         GUARD = new TpGuard(CONFIG);
+        Network.register();
         SelectorUnlock.init();
 
         CommandRegistrationCallback.EVENT.register((d, registryAccess, environment) -> {
@@ -61,4 +63,32 @@ public final class MyrinTPMod implements ModInitializer {
             }
         });
     }
+
+    /** 服务端：处理客户端配置同步请求（0=查询，1=提交）。OP 判定以服务端为准（26.3 权限集）。 */
+    public static void onConfigSync(ServerPlayer player, int type, String json) {
+        boolean op = player.getServer() != null && player.getServer().getPlayerList().isOp(player.nameAndId());
+        if (type == 0) {
+            sendConfigStatus(player, op);
+            return;
+        }
+        if (type != 1) {
+            return;
+        }
+        if (!op) {
+            player.sendSystemMessage(Component.literal("你没有权限执行此指令！请联系服务器管理员处理！"));
+            sendConfigStatus(player, false);
+            return;
+        }
+        Config n = Config.fromJson(json);
+        CONFIG.copyFrom(n);
+        CONFIG.save(CONFIG_FILE);
+        for (ServerPlayer p : player.server.getPlayerList().getPlayers()) {
+            sendConfigStatus(p, p.getServer() != null && p.getServer().getPlayerList().isOp(p.nameAndId()));
+        }
+    }
+
+    private static void sendConfigStatus(ServerPlayer player, boolean op) {
+        Network.sendToPlayer(player, new ConfigStatusPacket(op, CONFIG.toJsonString()));
+    }
 }
+

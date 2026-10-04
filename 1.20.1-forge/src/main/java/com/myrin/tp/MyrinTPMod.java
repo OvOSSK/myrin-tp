@@ -2,7 +2,9 @@ package com.myrin.tp;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -41,6 +43,7 @@ public final class MyrinTPMod {
         CONFIG = Config.load(CONFIG_FILE);
         DATA = DataStore.load(DATA_FILE);
         GUARD = new TpGuard(CONFIG);
+        Network.register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> MyrinConfigClient::register);
     }
 
@@ -81,4 +84,33 @@ public final class MyrinTPMod {
             }
         }
     }
+
+    /** 服务端：处理客户端配置同步请求（0=查询，1=提交）。OP 判定以服务端为准。 */
+    public static void onConfigSync(ServerPlayer player, int type, String json) {
+        boolean op = player.hasPermissions(2) || player.hasPermissions(3) || player.hasPermissions(4);
+        if (type == 0) {
+            sendConfigStatus(player, op);
+            return;
+        }
+        if (type != 1) {
+            return;
+        }
+        if (!op) {
+            player.sendSystemMessage(Component.literal("你没有权限执行此指令！请联系服务器管理员处理！"));
+            sendConfigStatus(player, false);
+            return;
+        }
+        Config n = Config.fromJson(json);
+        CONFIG.copyFrom(n);
+        CONFIG.save(CONFIG_FILE);
+        for (ServerPlayer p : player.server.getPlayerList().getPlayers()) {
+            sendConfigStatus(p, p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4));
+        }
+    }
+
+    private static void sendConfigStatus(ServerPlayer player, boolean op) {
+        Network.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                new ConfigStatusPacket(op, CONFIG.toJsonString()));
+    }
 }
+

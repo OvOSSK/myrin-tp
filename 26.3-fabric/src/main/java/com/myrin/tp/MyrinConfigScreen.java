@@ -30,12 +30,17 @@ public class MyrinConfigScreen extends Screen {
     private boolean cancelOnMove;
     private boolean deathBack;
 
+    /** 当前打开的配置界面（客户端），供网络回包刷新。 */
+    public static MyrinConfigScreen active;
+
     private final List<Button> modeButtons = new ArrayList<>();
     private final List<AbstractSliderButton> sliders = new ArrayList<>();
     private Button toggleMove;
     private Button toggleBack;
     private Button saveButton;
     private boolean canEdit;
+    private boolean localMode;
+    private boolean queried;
 
     public MyrinConfigScreen(Screen parent) {
         super(Component.literal("Myrin TP 设置"));
@@ -52,11 +57,17 @@ public class MyrinConfigScreen extends Screen {
         this.maxHomes = cfg.maxHomes;
         this.cancelOnMove = cfg.cancelOnMove;
         this.deathBack = cfg.deathBack;
-        this.canEdit = isOp();
+        MyrinConfigScreen.active = this;
     }
 
     @Override
     protected void init() {
+        this.localMode = this.minecraft.hasSingleplayerServer() || this.minecraft.player == null;
+        this.canEdit = localMode;
+        if (!localMode && !queried) {
+            queried = true;
+            sendSync(0, "");
+        }
         int x = this.width / 2 - 170;
         int rows = 10;
         int bottomY = this.height - 28;
@@ -68,7 +79,7 @@ public class MyrinConfigScreen extends Screen {
         for (int i = 0; i < 4; i++) {
             final int m = i;
             Button b = Button.builder(modeLabel(i),
-                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_FILE); refreshModeButtons(); })
+                    btn -> { mode = m; cfg.mode = m; if (localMode) { cfg.save(MyrinTPMod.CONFIG_FILE); } else { submit(); } refreshModeButtons(); })
                     .bounds(x + i * 100, 30, 90, 18).build();
             modeButtons.add(b);
             addRenderableWidget(b);
@@ -130,19 +141,63 @@ public class MyrinConfigScreen extends Screen {
     }
 
     private void save() {
-        cfg.mode = mode;
-        cfg.tpaRequestCooldownSeconds = tpaCooldown;
-        cfg.tpaRequestTimeoutSeconds = tprTimeout;
-        cfg.homeCooldownSeconds = homeCooldown;
-        cfg.backCooldownSeconds = backCooldown;
-        cfg.tprCooldownSeconds = tprCooldown;
-        cfg.teleportDelayTicks = delay;
-        cfg.tprRange = tprRange;
-        cfg.maxHomes = maxHomes;
-        cfg.cancelOnMove = cancelOnMove;
-        cfg.deathBack = deathBack;
-        cfg.save(MyrinTPMod.CONFIG_FILE);
+        if (!canEdit) {
+            return;
+        }
+        if (localMode) {
+            this.cfg = buildConfig();
+            this.cfg.save(MyrinTPMod.CONFIG_FILE);
+        } else {
+            submit();
+        }
         onClose();
+    }
+
+    /** 按当前界面临时值构造配置对象。 */
+    private Config buildConfig() {
+        Config c = new Config();
+        c.mode = mode;
+        c.tpaRequestCooldownSeconds = tpaCooldown;
+        c.tpaRequestTimeoutSeconds = tprTimeout;
+        c.homeCooldownSeconds = homeCooldown;
+        c.backCooldownSeconds = backCooldown;
+        c.tprCooldownSeconds = tprCooldown;
+        c.teleportDelayTicks = delay;
+        c.tprRange = tprRange;
+        c.maxHomes = maxHomes;
+        c.cancelOnMove = cancelOnMove;
+        c.deathBack = deathBack;
+        return c;
+    }
+
+    /** 网络模式：提交当前配置给服务器（服务端校验 OP 并广播）。 */
+    private void submit() {
+        sendSync(1, buildConfig().toJsonString());
+    }
+
+    private void sendSync(int type, String json) {
+        Network.sendToServer(new ConfigSyncPacket(type, json));
+    }
+
+    /** 服务器回包：更新权限状态与服务器配置，并重建界面。 */
+    public void onConfigStatus(boolean edit, String json) {
+        if (!localMode && json != null && !json.isEmpty()) {
+            Config n = Config.fromJson(json);
+            this.cfg = n;
+            this.mode = n.mode;
+            this.tpaCooldown = n.tpaRequestCooldownSeconds;
+            this.tprTimeout = n.tpaRequestTimeoutSeconds;
+            this.homeCooldown = n.homeCooldownSeconds;
+            this.backCooldown = n.backCooldownSeconds;
+            this.tprCooldown = n.tprCooldownSeconds;
+            this.delay = n.teleportDelayTicks;
+            this.tprRange = n.tprRange;
+            this.maxHomes = n.maxHomes;
+            this.cancelOnMove = n.cancelOnMove;
+            this.deathBack = n.deathBack;
+        }
+        this.canEdit = edit;
+        this.init();
     }
 
     @Override
@@ -179,25 +234,14 @@ public class MyrinConfigScreen extends Screen {
         }
     }
 
-    /** 是否有权修改配置：单机/局域网主机、主界面（未进游戏）或服务端同步的 OP 权限均放行。 */
+    /** 是否有权修改：本地模式（主机/主界面）直接放行，网络模式以服务器回包为准。 */
     private boolean isOp() {
-        try {
-            net.minecraft.client.player.LocalPlayer p = this.minecraft.player;
-            if (p != null && p.permissions().hasPermission(
-                    new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.GAMEMASTERS))) {
-                return true;
-            }
-            if (this.minecraft.hasSingleplayerServer()) {
-                return true;
-            }
-            return p == null;
-        } catch (Exception e) {
-            return false;
-        }
+        return localMode;
     }
 
     @Override
     public void onClose() {
+        MyrinConfigScreen.active = null;
         Minecraft.getInstance().setScreenAndShow(parent);
     }
 }
