@@ -2,6 +2,7 @@ package com.myrin.tp;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -59,12 +60,13 @@ public final class GuardNodes {
             }
             Field cmdField = CommandNode.class.getDeclaredField("command");
             cmdField.setAccessible(true);
-            cmdField.set(node, (Command<CommandSourceStack>) src -> {
+            cmdField.set(node, (Command<CommandSourceStack>) ctx -> {
+                CommandSourceStack src = ctx.getSource();
                 if (!guard.allows(src, name)) {
                     src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
                     return 0;
                 }
-                return original.execute(src);
+                return original.execute(ctx);
             });
         } catch (Exception ignored) {
             // 单个节点包装失败不影响其他节点
