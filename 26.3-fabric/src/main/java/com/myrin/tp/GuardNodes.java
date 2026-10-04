@@ -66,7 +66,7 @@ public final class GuardNodes {
                     src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
                     return 0;
                 }
-                return original.execute(ctx);
+                return original.run(ctx);
             });
         } catch (Exception ignored) {
             // 单个节点包装失败不影响其他节点
