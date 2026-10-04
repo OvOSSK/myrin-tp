@@ -78,6 +78,8 @@ public final class SafeTeleport {
             if (!level.getWorldBorder().isWithinBounds(new BlockPos(x, 0, z))) {
                 continue;
             }
+            // 强制加载（必要时生成）目标区块，保证高度图与方块状态可用
+            level.getChunk(x >> 4, z >> 4);
             int topY = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(x, 0, z)).getY();
             for (int dy = 0; dy <= 16; dy++) {
                 int y = topY - dy;
