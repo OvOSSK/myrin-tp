@@ -142,12 +142,12 @@ public class MyrinConfigScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
         g.fill(0, 0, this.width, this.height, 0xFF111111);
+        super.render(g, mx, my, pt);
         int x = this.width / 2 - 170;
         g.drawString(this.font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 12, 0xFFFFFFFF);
         if (this.height >= 260) {
             g.drawString(this.font, Component.literal("模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。"), x, 52, 0xFFAAAAAA);
         }
-        super.render(g, mx, my, pt);
     }
 
     @Override
