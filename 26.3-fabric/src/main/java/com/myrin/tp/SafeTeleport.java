@@ -4,12 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
@@ -21,20 +24,32 @@ public final class SafeTeleport {
     }
 
     /**
-     * 判断某个方块位置是否适合站立（不淹水、不踩岩浆、脚下有实心方块、头顶不窒息）。
+     * 判断某个方块位置是否适合站立：
+     * 世界边界内、脚下有实心方块、站立点与头顶为空、无流体、无危险方块（液体/仙人掌/火）。
      */
     public static boolean isSafe(ServerLevel level, BlockPos pos) {
-        if (pos.getY() < level.getMinY() + 2) {
+        if (pos.getY() < level.getMinBuildHeight() + 2) {
             return false;
         }
-        if (!level.getBlockState(pos).isAir() || !level.getBlockState(pos.above()).isAir()) {
+        if (!level.getWorldBorder().isWithinBounds(pos)) {
             return false;
         }
+        BlockPos head = pos.above();
         BlockPos below = pos.below();
-        if (level.getBlockState(below).isAir()) {
+        if (!level.getBlockState(pos).isAir() || !level.getBlockState(head).isAir()) {
             return false;
         }
-        if (!level.getFluidState(pos).isEmpty() || !level.getFluidState(below).isEmpty()) {
+        if (!level.getFluidState(pos).isEmpty() || !level.getFluidState(head).isEmpty()) {
+            return false;
+        }
+        BlockState belowState = level.getBlockState(below);
+        if (belowState.isAir()) {
+            return false;
+        }
+        if (!level.getFluidState(below).isEmpty()) {
+            return false;
+        }
+        if (isDangerous(belowState) || isDangerous(level.getBlockState(pos)) || isDangerous(level.getBlockState(head))) {
             return false;
         }
         return true;
@@ -53,27 +68,40 @@ public final class SafeTeleport {
     }
 
     /**
-     * 在目标维度以出生点为中心随机寻找安全落点。
+     * 在目标维度以给定坐标为中心随机寻找安全落点：
+     * 随机 x/z（范围内且在世界边界内），从地表高度向下扫描 16 格找安全站立点。
      */
     public static BlockPos randomSafe(ServerLevel level, BlockPos center, int range, int attempts) {
         for (int i = 0; i < attempts; i++) {
             int x = center.getX() + level.getRandom().nextInt(range * 2 + 1) - range;
             int z = center.getZ() + level.getRandom().nextInt(range * 2 + 1) - range;
-            int y = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(x, 0, z)).getY() + 1;
-            BlockPos pos = new BlockPos(x, y, z);
-            if (isSafe(level, pos)) {
-                return pos;
+            if (!level.getWorldBorder().isWithinBounds(new BlockPos(x, 0, z))) {
+                continue;
+            }
+            int topY = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(x, 0, z)).getY();
+            for (int dy = 0; dy <= 16; dy++) {
+                int y = topY - dy;
+                BlockPos pos = new BlockPos(x, y, z);
+                if (isSafe(level, pos)) {
+                    return pos;
+                }
             }
         }
-        // 尝试失败，回退到中心点上方
-        BlockPos fallback = center.above(2);
+        // 全部尝试失败：回退到中心附近的安全位置
+        BlockPos fallback = adjustUp(level, center.above(2));
         return isSafe(level, fallback) ? fallback : center;
+    }
+
+    private static boolean isDangerous(BlockState state) {
+        return state.getBlock() instanceof LiquidBlock
+                || state.getBlock() instanceof CactusBlock
+                || state.getBlock() instanceof FireBlock;
     }
 
     /** 按维度 key 获取服务端世界。 */
     public static ServerLevel levelByKey(net.minecraft.server.MinecraftServer server, String dimension) {
         try {
-            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, Identifier.tryParse(dimension));
+            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
             ServerLevel level = server.getLevel(key);
             return level != null ? level : server.overworld();
         } catch (Exception e) {
@@ -86,8 +114,8 @@ public final class SafeTeleport {
      */
     public static void teleportPlayer(ServerPlayer player, ServerLevel target, double x, double y, double z, float yaw, float pitch) {
         ServerLevel old = (ServerLevel) player.level();
-        player.teleportTo(target, x, y, z, java.util.Set.of(), yaw, pitch, false);
-        old.playSound(null, old.getRespawnData().pos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        player.teleportTo(target, x, y, z, yaw, pitch);
+        old.playSound(null, old.getSharedSpawnPos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
         old.sendParticles(ParticleTypes.PORTAL, x, y + 1, z, 32, 0.5, 0.5, 0.5, 0.2);
         target.playSound(null, new BlockPos((int) x, (int) y, (int) z), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
         target.sendParticles(ParticleTypes.PORTAL, x, y + 1, z, 32, 0.5, 0.5, 0.5, 0.2);

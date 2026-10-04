@@ -9,6 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -46,6 +47,13 @@ public final class MyrinTPMod {
     public static final class Events {
 
         @SubscribeEvent
+        public static void onCommand(CommandEvent event) {
+            if (CommandBlocker.shouldCancel(event.getParseResults(), GUARD)) {
+                event.setCanceled(true);
+            }
+        }
+
+        @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             dispatcher = event.getDispatcher();
             MyrinCommands.register(dispatcher);
@@ -54,7 +62,7 @@ public final class MyrinTPMod {
         @SubscribeEvent
         public static void onServerStarted(ServerStartedEvent event) {
             TP = new TpManager(event.getServer(), CONFIG, DATA);
-            GuardNodes.apply(dispatcher, GUARD);
+            GuardNodes.apply(dispatcher);
             SelectorPerm.inject();
         }
 

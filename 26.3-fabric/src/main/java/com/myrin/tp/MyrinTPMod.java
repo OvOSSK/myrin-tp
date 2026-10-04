@@ -41,7 +41,7 @@ public final class MyrinTPMod implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             TP = new TpManager(server, CONFIG, DATA);
-            GuardNodes.apply(dispatcher, GUARD);
+            GuardNodes.apply(dispatcher);
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {

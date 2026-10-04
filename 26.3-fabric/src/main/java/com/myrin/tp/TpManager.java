@@ -352,7 +352,7 @@ public final class TpManager {
                 ? (ServerLevel) p.level()
                 : SafeTeleport.levelByKey(server, config.tprDimension);
         BlockPos center = new BlockPos((int) p.getX(), (int) p.getY(), (int) p.getZ());
-        BlockPos pos = SafeTeleport.randomSafe(target, center, range, config.tprAttempts);
+        BlockPos pos = SafeTeleport.randomSafe(target, center, range, Math.max(50, config.tprAttempts));
         teleportWithDelay(p, target, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, p.getYRot(), p.getXRot());
         ok(p, "正在随机传送……");
         return 1;

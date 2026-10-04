@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,6 +44,13 @@ public final class MyrinTPMod {
     public static final class Events {
 
         @SubscribeEvent
+        public static void onCommand(CommandEvent event) {
+            if (CommandBlocker.shouldCancel(event.getParseResults(), GUARD)) {
+                event.setCanceled(true);
+            }
+        }
+
+        @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             dispatcher = event.getDispatcher();
             MyrinCommands.register(dispatcher);
@@ -51,7 +59,7 @@ public final class MyrinTPMod {
         @SubscribeEvent
         public static void onServerStarted(ServerStartedEvent event) {
             TP = new TpManager(event.getServer(), CONFIG, DATA);
-            GuardNodes.apply(dispatcher, GUARD);
+            GuardNodes.apply(dispatcher);
             SelectorPerm.inject();
         }
 
