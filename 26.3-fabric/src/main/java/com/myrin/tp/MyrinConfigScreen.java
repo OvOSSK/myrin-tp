@@ -63,7 +63,7 @@ public class MyrinConfigScreen extends Screen {
             final int m = i;
             Button b = Button.builder(modeLabel(i),
                     btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); })
-                    .bounds(x + i * 122, 34, 110, 20).build();
+                    .bounds(x + i * 100, 34, 90, 20).build();
             modeButtons.add(b);
             addRenderableWidget(b);
         }
@@ -93,7 +93,7 @@ public class MyrinConfigScreen extends Screen {
     }
 
     private Component modeLabel(int i) {
-        return Component.literal("模式 " + i + (mode == i ? "(当前)" : "") + " " + MODE_LABELS[i]);
+        return Component.literal("模式 " + i + (mode == i ? "(当前)" : ""));
     }
 
     private void refreshModeButtons() {
@@ -137,8 +137,8 @@ public class MyrinConfigScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor ex, int mx, int my, float pt) {
         ex.fill(0, 0, this.width, this.height, 0xFF111111);
         int x = this.width / 2 - 170;
-        ex.text(font, "指令管控：0 关闭 / 1 非OP仅TP / 2 OP禁非TP / 3 同时启用", x, 16, 0xFFFFFFFF);
-        ex.text(font, "模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。", x, this.height - 62, 0xFFAAAAAA);
+        ex.text(font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 16, 0xFFFFFFFF);
+        ex.text(font, Component.literal("模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。"), x, this.height - 62, 0xFFAAAAAA);
         super.extractRenderState(ex, mx, my, pt);
     }
 

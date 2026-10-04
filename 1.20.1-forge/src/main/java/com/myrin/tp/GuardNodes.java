@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * 指令树包装：
  * - 原版 tp/teleport 默认要求 OP 权限，这里放开给所有玩家，让生存无作弊也能用；
  * - 其余指令保留原版补全，执行时按管控规则拦截并提示（不删指令补全）。
- * Brigadier 没提供公开的字段写入方法，用反射；反射失败降级成不限制，不让服务端崩。
+ * Brigadier 的执行逻辑挂在叶子节点上，递归包装整棵子树，按顶层指令名判定。
  */
 public final class GuardNodes {
 
@@ -38,12 +38,8 @@ public final class GuardNodes {
                 }
                 if (TpGuard.TP_COMMANDS.contains(name)) {
                     reqField.set(node, (Predicate<CommandSourceStack>) s -> true);
-                    continue;
                 }
-                if (guard.isWhitelisted(name)) {
-                    continue;
-                }
-                wrapExecution(node, guard, name);
+                wrapTree(node, guard);
             }
         } catch (Exception e) {
             enabled = false;
@@ -51,25 +47,27 @@ public final class GuardNodes {
         }
     }
 
-    /** 包装指令执行：管控不通过时提示并拒绝，保留原版补全。 */
-    private static void wrapExecution(CommandNode<CommandSourceStack> node, TpGuard guard, String name) {
+    /** 递归包装整棵子树：有执行逻辑的节点都包一层，执行时按顶层指令名判定。 */
+    private static void wrapTree(CommandNode<CommandSourceStack> node, TpGuard guard) {
         try {
             Command<CommandSourceStack> original = node.getCommand();
-            if (original == null) {
-                return;
-            }
-            Field cmdField = CommandNode.class.getDeclaredField("command");
-            cmdField.setAccessible(true);
-            cmdField.set(node, (Command<CommandSourceStack>) ctx -> {
-                CommandSourceStack src = ctx.getSource();
-                if (!guard.allows(src, name)) {
-                    src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
+            if (original != null) {
+                Field cmdField = CommandNode.class.getDeclaredField("command");
+                cmdField.setAccessible(true);
+                cmdField.set(node, (Command<CommandSourceStack>) ctx -> {
+                    String top = ctx.getNodes().isEmpty() ? "" : ctx.getNodes().get(0).getNode().getName();
+                    if (TpGuard.MOD_COMMANDS.contains(top) || TpGuard.TP_COMMANDS.contains(top) || guard.allows(ctx.getSource(), top)) {
+                        return original.run(ctx);
+                    }
+                    ctx.getSource().sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
                     return 0;
-                }
-                return original.run(ctx);
-            });
+                });
+            }
         } catch (Exception ignored) {
             // 单个节点包装失败不影响其他节点
+        }
+        for (CommandNode<CommandSourceStack> child : node.getChildren()) {
+            wrapTree(child, guard);
         }
     }
 }
