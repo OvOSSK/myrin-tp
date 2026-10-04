@@ -46,7 +46,7 @@ public final class CommandBlocker {
             if (guard.allows(src, cmd)) {
                 return false;
             }
-            src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
+            src.sendFailure(Component.literal("你没有权限执行此指令！请联系服务器管理员处理！"));
             return true;
         } catch (Exception e) {
             System.err.println("[myrintp] 指令管控判定异常，按禁止处理：" + e);
