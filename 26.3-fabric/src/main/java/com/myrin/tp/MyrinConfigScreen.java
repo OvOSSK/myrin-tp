@@ -154,9 +154,6 @@ public class MyrinConfigScreen extends Screen {
         ex.fill(0, 0, this.width, this.height, 0xFF111111);
         int x = this.width / 2 - 170;
         ex.text(font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 12, 0xFFFFFFFF);
-        if (this.height >= 260) {
-            ex.text(font, Component.literal("模式点击立即生效；参数拖动调节，保存后生效。"), x, 52, 0xFFAAAAAA);
-        }
         super.extractRenderState(ex, mx, my, pt);
     }
 
