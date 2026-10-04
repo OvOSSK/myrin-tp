@@ -15,21 +15,26 @@ public final class CommandBlocker {
     private CommandBlocker() {
     }
 
-    /** 返回 true 表示应取消本次执行（已发送红字提示）。 */
+    /** 返回 true 表示应取消本次执行（已发送红字提示）。判定异常时按 fail-closed 拦截。 */
     public static boolean shouldCancel(ParseResults<CommandSourceStack> parse, TpGuard guard) {
-        CommandSourceStack src = parse.getContext().getSource();
-        if (!(src.getEntity() instanceof ServerPlayer)) {
-            return false;
+        try {
+            CommandSourceStack src = parse.getContext().getSource();
+            if (!(src.getEntity() instanceof ServerPlayer)) {
+                return false;
+            }
+            String cmd = resolveName(parse);
+            if (TpGuard.MOD_COMMANDS.contains(cmd) || TpGuard.TP_COMMANDS.contains(cmd)) {
+                return false;
+            }
+            if (guard.allows(src, cmd)) {
+                return false;
+            }
+            src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
+            return true;
+        } catch (Exception e) {
+            System.err.println("[myrintp] 指令管控判定异常，按禁止处理：" + e);
+            return true;
         }
-        String cmd = resolveName(parse);
-        if (TpGuard.MOD_COMMANDS.contains(cmd) || TpGuard.TP_COMMANDS.contains(cmd)) {
-            return false;
-        }
-        if (guard.allows(src, cmd)) {
-            return false;
-        }
-        src.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
-        return true;
     }
 
     private static String resolveName(ParseResults<CommandSourceStack> parse) {

@@ -64,7 +64,11 @@ public final class TpGuard {
                 return true;
             }
         }
-        boolean isOp = src.hasPermission(2);
+        // OP 判定：hasPermission 为“大于等于”语义，多级保险覆盖各版本差异
+        boolean isOp = src.hasPermission(2) || src.hasPermission(3) || src.hasPermission(4);
+        if (!isOp && src.getEntity() instanceof ServerPlayer p) {
+            isOp = p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4);
+        }
         return switch (mode) {
             case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
             case 2 -> !isOp;   // 管理员仅TP：管理员只能 TP
