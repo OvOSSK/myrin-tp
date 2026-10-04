@@ -86,21 +86,21 @@ public class MyrinConfigScreen extends Screen {
         }
 
         int y = topY;
-        addSlider("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v, x, y, ctrlH); y += step;
-        addSlider("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v, x, y, ctrlH); y += step;
-        addSlider("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v, x, y, ctrlH); y += step;
-        addSlider("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v, x, y, ctrlH); y += step;
-        addSlider("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v, x, y, ctrlH); y += step;
-        addSlider("传送倒计时(刻)", delay, 0, 200, v -> delay = v, x, y, ctrlH); y += step;
-        addSlider("随机传送范围", tprRange, 100, 200000, v -> tprRange = v, x, y, ctrlH); y += step;
-        addSlider("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v, x, y, ctrlH); y += step;
+        addSlider("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> { tpaCooldown = v; if (localMode) { cfg.tpaRequestCooldownSeconds = v; } }, x, y, ctrlH); y += step;
+        addSlider("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> { tprTimeout = v; if (localMode) { cfg.tpaRequestTimeoutSeconds = v; } }, x, y, ctrlH); y += step;
+        addSlider("回家冷却(秒)", homeCooldown, 0, 3600, v -> { homeCooldown = v; if (localMode) { cfg.homeCooldownSeconds = v; } }, x, y, ctrlH); y += step;
+        addSlider("返回冷却(秒)", backCooldown, 0, 3600, v -> { backCooldown = v; if (localMode) { cfg.backCooldownSeconds = v; } }, x, y, ctrlH); y += step;
+        addSlider("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> { tprCooldown = v; if (localMode) { cfg.tprCooldownSeconds = v; } }, x, y, ctrlH); y += step;
+        addSlider("传送倒计时(刻)", delay, 0, 200, v -> { delay = v; if (localMode) { cfg.teleportDelayTicks = v; } }, x, y, ctrlH); y += step;
+        addSlider("随机传送范围", tprRange, 100, 200000, v -> { tprRange = v; if (localMode) { cfg.tprRange = v; } }, x, y, ctrlH); y += step;
+        addSlider("家点数量上限", maxHomes, 1, 100, v -> { maxHomes = v; if (localMode) { cfg.maxHomes = v; } }, x, y, ctrlH); y += step;
 
         toggleMove = Button.builder(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关")),
-                b -> { cancelOnMove = !cancelOnMove; b.setMessage(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关"))); })
+                b -> { cancelOnMove = !cancelOnMove; if (localMode) { cfg.cancelOnMove = cancelOnMove; } b.setMessage(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关"))); })
                 .bounds(x, y, 340, ctrlH).build();
         addRenderableWidget(toggleMove); y += step;
         toggleBack = Button.builder(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关")),
-                b -> { deathBack = !deathBack; b.setMessage(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关"))); })
+                b -> { deathBack = !deathBack; if (localMode) { cfg.deathBack = deathBack; } b.setMessage(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关"))); })
                 .bounds(x, y, 340, ctrlH).build();
         addRenderableWidget(toggleBack);
 
@@ -145,8 +145,8 @@ public class MyrinConfigScreen extends Screen {
             return;
         }
         if (localMode) {
-            this.cfg = buildConfig();
-            this.cfg.save(MyrinTPMod.CONFIG_FILE);
+            MyrinTPMod.CONFIG.copyFrom(buildConfig());
+            MyrinTPMod.CONFIG.save(MyrinTPMod.CONFIG_FILE);
         } else {
             submit();
         }
