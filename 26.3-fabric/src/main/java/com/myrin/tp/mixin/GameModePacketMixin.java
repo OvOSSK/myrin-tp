@@ -19,7 +19,7 @@ public abstract class GameModePacketMixin {
     @Inject(method = "handleChangeGameMode", at = @At("HEAD"), cancellable = true)
     private void myrintp$blockChangeGameMode(ServerboundChangeGameModePacket packet, CallbackInfo ci) {
         if (CommandBlocker.shouldBlockGameModeSwitch(this.player)) {
-            this.player.sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
+            this.player.createCommandSourceStack().sendFailure(Component.literal("该指令已被管理员禁止！仅允许使用 TP 类指令"));
             ci.cancel();
         }
     }
