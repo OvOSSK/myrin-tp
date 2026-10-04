@@ -4,9 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -15,10 +12,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 配置界面：参数行放在可滚动列表内，适配小分辨率与原版/钠界面缩放；
- * 提示文字与保存/取消固定在底部，互不遮挡。
+ * 配置界面：参数直接平铺（不使用滚动列表），滑块可鼠标拖动，
+ * 所有行完整显示，纯色背景，适配原版与钠界面缩放。
  */
 public class MyrinConfigScreen extends Screen {
+    private static final String[] MODE_LABELS = {
+            "关闭模组功能", "非OP玩家仅允许TP指令", "OP玩家禁止非TP指令", "同时启用"
+    };
+
     private final Screen parent;
     private final Config cfg;
     private int mode;
@@ -33,8 +34,9 @@ public class MyrinConfigScreen extends Screen {
     private boolean cancelOnMove;
     private boolean deathBack;
 
-    private ConfigList list;
     private final List<Button> modeButtons = new ArrayList<>();
+    private Button toggleMove;
+    private Button toggleBack;
 
     public MyrinConfigScreen(Screen parent) {
         super(Component.literal("Myrin TP 设置"));
@@ -59,56 +61,60 @@ public class MyrinConfigScreen extends Screen {
         modeButtons.clear();
         for (int i = 0; i < 4; i++) {
             final int m = i;
-            int bx = x + i * 122;
-            Button b = Button.builder(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")),
-                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); rebuild(); })
-                    .bounds(bx, 34, 110, 20).build();
+            Button b = Button.builder(modeLabel(i),
+                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); })
+                    .bounds(x + i * 122, 34, 110, 20).build();
             modeButtons.add(b);
             addRenderableWidget(b);
         }
 
-        int listTop = 62;
-        int listBottom = this.height - 70;
-        if (listBottom < listTop + 60) {
-            listBottom = listTop + 60;
-        }
-        list = new ConfigList(Minecraft.getInstance(), 340, listBottom - listTop, listTop, listBottom);
-        list.setX(x);
-        rebuildList();
-        addRenderableWidget(list);
+        int y = 62;
+        addSlider("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v, x, y); y += 24;
+        addSlider("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v, x, y); y += 24;
+        addSlider("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v, x, y); y += 24;
+        addSlider("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v, x, y); y += 24;
+        addSlider("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v, x, y); y += 24;
+        addSlider("传送倒计时(刻)", delay, 0, 200, v -> delay = v, x, y); y += 24;
+        addSlider("随机传送范围", tprRange, 100, 200000, v -> tprRange = v, x, y); y += 24;
+        addSlider("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v, x, y); y += 24;
+
+        toggleMove = Button.builder(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关")),
+                b -> { cancelOnMove = !cancelOnMove; b.setMessage(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关"))); })
+                .bounds(x, y, 340, 20).build();
+        addRenderableWidget(toggleMove); y += 24;
+        toggleBack = Button.builder(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关")),
+                b -> { deathBack = !deathBack; b.setMessage(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关"))); })
+                .bounds(x, y, 340, 20).build();
+        addRenderableWidget(toggleBack);
 
         int by = this.height - 32;
         addRenderableWidget(Button.builder(Component.literal("保存"), b -> save()).bounds(x, by, 120, 20).build());
         addRenderableWidget(Button.builder(Component.literal("取消"), b -> onClose()).bounds(x + 132, by, 120, 20).build());
     }
 
-    private void rebuildList() {
-        if (list == null) {
-            return;
-        }
-        list.clearAll();
-        list.add(new SliderEntry("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v));
-        list.add(new SliderEntry("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v));
-        list.add(new SliderEntry("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v));
-        list.add(new SliderEntry("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v));
-        list.add(new SliderEntry("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v));
-        list.add(new SliderEntry("传送倒计时(刻)", delay, 0, 200, v -> delay = v));
-        list.add(new SliderEntry("随机传送范围", tprRange, 100, 200000, v -> tprRange = v));
-        list.add(new SliderEntry("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v));
-        list.add(new ToggleEntry("倒计时期间移动取消", cancelOnMove, v -> cancelOnMove = v));
-        list.add(new ToggleEntry("/back 优先回死亡点", deathBack, v -> deathBack = v));
-    }
-
-    private void rebuild() {
-        if (list != null) {
-            rebuildList();
-        }
+    private Component modeLabel(int i) {
+        return Component.literal("模式 " + i + (mode == i ? "(当前)" : "") + " " + MODE_LABELS[i]);
     }
 
     private void refreshModeButtons() {
         for (int i = 0; i < modeButtons.size(); i++) {
-            modeButtons.get(i).setMessage(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")));
+            modeButtons.get(i).setMessage(modeLabel(i));
         }
+    }
+
+    private void addSlider(String label, int value, int min, int max, Consumer<Integer> setter, int x, int y) {
+        double v = max <= min ? 0.0 : (double) (value - min) / (double) (max - min);
+        addRenderableWidget(new AbstractSliderButton(x, y, 340, 20, Component.literal(label + ": " + value), v) {
+            @Override
+            protected void updateMessage() {
+                setMessage(Component.literal(label + ": " + (min + (int) Math.round((max - min) * value))));
+            }
+
+            @Override
+            protected void applyValue() {
+                setter.accept(min + (int) Math.round((max - min) * value));
+            }
+        });
     }
 
     private void save() {
@@ -130,133 +136,14 @@ public class MyrinConfigScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor ex, int mx, int my, float pt) {
         ex.fill(0, 0, this.width, this.height, 0xFF111111);
-        super.extractRenderState(ex, mx, my, pt);
         int x = this.width / 2 - 170;
-        ex.text(font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
+        ex.text(font, "指令管控：0 关闭 / 1 非OP仅TP / 2 OP禁非TP / 3 同时启用", x, 16, 0xFFFFFFFF);
         ex.text(font, "模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。", x, this.height - 62, 0xFFAAAAAA);
+        super.extractRenderState(ex, mx, my, pt);
     }
 
     @Override
     public void onClose() {
         Minecraft.getInstance().setScreenAndShow(parent);
-    }
-
-    /** 参数行：可拖动滑块调节数值 */
-    private final class SliderEntry extends ContainerObjectSelectionList.Entry<SliderEntry> {
-        private final Slider slider;
-
-        SliderEntry(String label, int value, int min, int max, Consumer<Integer> setter) {
-            double v = max <= min ? 0.0 : (double) (value - min) / (double) (max - min);
-            this.slider = new Slider(label, min, max, v, setter);
-        }
-
-        @Override
-        public List<? extends GuiEventListener> children() {
-            return List.of(slider);
-        }
-
-        @Override
-        public List<? extends NarratableEntry> narratables() {
-            return children().stream().filter(c -> c instanceof NarratableEntry).map(c -> (NarratableEntry) c).toList();
-        }
-
-        @Override
-        public void extractContent(GuiGraphicsExtractor ex, int mx, int my, boolean hovered, float pt) {
-            slider.setX(this.getX());
-            slider.setY(this.getY());
-            slider.setWidth(340);
-            slider.extractRenderState(ex, mx, my, pt);
-        }
-
-        /** 拖动滑块即时更新数值变量，保存时统一落盘 */
-        private final class Slider extends AbstractSliderButton {
-            private final String label;
-            private final int min;
-            private final int max;
-            private final Consumer<Integer> setter;
-
-            Slider(String label, int min, int max, double value, Consumer<Integer> setter) {
-                super(0, 0, 340, 20, Component.literal(label), value);
-                this.label = label;
-                this.min = min;
-                this.max = max;
-                this.setter = setter;
-                updateMessage();
-            }
-
-            @Override
-            protected void updateMessage() {
-                setMessage(Component.literal(label + ": " + current()));
-            }
-
-            @Override
-            protected void applyValue() {
-                setter.accept(current());
-            }
-
-            private int current() {
-                return min + (int) Math.round((max - min) * value);
-            }
-        }
-    }
-
-    /** 开关行：点击切换 */
-    private final class ToggleEntry extends ContainerObjectSelectionList.Entry<ToggleEntry> {
-        private final Button toggle;
-        private final String label;
-        private boolean value;
-        private final Consumer<Boolean> setter;
-
-        ToggleEntry(String label, boolean value, Consumer<Boolean> setter) {
-            this.label = label;
-            this.value = value;
-            this.setter = setter;
-            this.toggle = Button.builder(Component.literal(label + ": " + (value ? "开" : "关")), b -> change()).bounds(0, 0, 250, 20).build();
-        }
-
-        private void change() {
-            value = !value;
-            setter.accept(value);
-            toggle.setMessage(Component.literal(label + ": " + (value ? "开" : "关")));
-            rebuildList();
-        }
-
-        @Override
-        public List<? extends GuiEventListener> children() {
-            return List.of(toggle);
-        }
-
-        @Override
-        public List<? extends NarratableEntry> narratables() {
-            return children().stream().filter(c -> c instanceof NarratableEntry).map(c -> (NarratableEntry) c).toList();
-        }
-
-        @Override
-        public void extractContent(GuiGraphicsExtractor ex, int mx, int my, boolean hovered, float pt) {
-            toggle.setX(this.getX());
-            toggle.setY(this.getY());
-            toggle.extractRenderState(ex, mx, my, pt);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private static final class ConfigList extends ContainerObjectSelectionList {
-        ConfigList(Minecraft mc, int width, int height, int y0, int y1) {
-            super(mc, width, height, y0, y1);
-        }
-
-        @Override
-        public int getRowWidth() {
-            return 340;
-        }
-
-        public void clearAll() {
-            clearEntries();
-        }
-
-        @SuppressWarnings("unchecked")
-        public void add(ContainerObjectSelectionList.Entry e) {
-            addEntry(e);
-        }
     }
 }
