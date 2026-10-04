@@ -179,12 +179,18 @@ public class MyrinConfigScreen extends Screen {
         }
     }
 
-    /** 客户端本地判断当前玩家是否 OP（26.3 权限集 API）。 */
+    /** 是否有权修改配置：单机/局域网主机、主界面（未进游戏）或服务端同步的 OP 权限均放行。 */
     private boolean isOp() {
         try {
             net.minecraft.client.player.LocalPlayer p = this.minecraft.player;
-            return p != null && p.permissions().hasPermission(
-                    new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.GAMEMASTERS));
+            if (p != null && p.permissions().hasPermission(
+                    new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.GAMEMASTERS))) {
+                return true;
+            }
+            if (this.minecraft.hasSingleplayerServer()) {
+                return true;
+            }
+            return p == null;
         } catch (Exception e) {
             return false;
         }
