@@ -3,8 +3,8 @@ package com.myrin.tp;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -28,7 +28,7 @@ public final class SafeTeleport {
      * 世界边界内、脚下有实心方块、站立点与头顶为空、无流体、无危险方块（液体/仙人掌/火）。
      */
     public static boolean isSafe(ServerLevel level, BlockPos pos) {
-        if (pos.getY() < level.getMinBuildHeight() + 2) {
+        if (pos.getY() < level.getMinY() + 2) {
             return false;
         }
         if (!level.getWorldBorder().isWithinBounds(pos)) {
@@ -101,7 +101,7 @@ public final class SafeTeleport {
     /** 按维度 key 获取服务端世界。 */
     public static ServerLevel levelByKey(net.minecraft.server.MinecraftServer server, String dimension) {
         try {
-            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
+            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, Identifier.tryParse(dimension));
             ServerLevel level = server.getLevel(key);
             return level != null ? level : server.overworld();
         } catch (Exception e) {
@@ -114,8 +114,8 @@ public final class SafeTeleport {
      */
     public static void teleportPlayer(ServerPlayer player, ServerLevel target, double x, double y, double z, float yaw, float pitch) {
         ServerLevel old = (ServerLevel) player.level();
-        player.teleportTo(target, x, y, z, yaw, pitch);
-        old.playSound(null, old.getSharedSpawnPos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        player.teleportTo(target, x, y, z, java.util.Set.of(), yaw, pitch, false);
+        old.playSound(null, old.getRespawnData().pos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
         old.sendParticles(ParticleTypes.PORTAL, x, y + 1, z, 32, 0.5, 0.5, 0.5, 0.2);
         target.playSound(null, new BlockPos((int) x, (int) y, (int) z), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
         target.sendParticles(ParticleTypes.PORTAL, x, y + 1, z, 32, 0.5, 0.5, 0.5, 0.2);

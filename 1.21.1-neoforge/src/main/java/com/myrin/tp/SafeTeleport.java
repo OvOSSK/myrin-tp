@@ -101,7 +101,7 @@ public final class SafeTeleport {
     /** 按维度 key 获取服务端世界。 */
     public static ServerLevel levelByKey(net.minecraft.server.MinecraftServer server, String dimension) {
         try {
-            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
+            ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, ResourceLocation.tryParse(dimension));
             ServerLevel level = server.getLevel(key);
             return level != null ? level : server.overworld();
         } catch (Exception e) {
