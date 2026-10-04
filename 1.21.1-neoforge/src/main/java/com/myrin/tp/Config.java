@@ -34,7 +34,7 @@ public final class Config {
     public boolean cancelOnMove = true;            // 倒计时期间移动则取消
     public int tprRange = 10000;                   // 随机传送范围（以主城出生点为中心）
     public int tprAttempts = 12;                   // 随机落点尝试次数
-    public String tprDimension = "minecraft:overworld"; // 随机传送目标维度
+    public String tprDimension = ""; // 随机传送目标维度
     public int maxHomes = 20;                      // 每个玩家最大家点数量
     public boolean deathBack = true;               // /back 优先返回死亡点
 

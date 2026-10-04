@@ -55,20 +55,19 @@ public final class SafeTeleport {
     /**
      * 在目标维度以出生点为中心随机寻找安全落点。
      */
-    public static BlockPos randomSafe(ServerLevel level, int range, int attempts) {
-        BlockPos spawn = level.getSharedSpawnPos();
+    public static BlockPos randomSafe(ServerLevel level, BlockPos center, int range, int attempts) {
         for (int i = 0; i < attempts; i++) {
-            int x = spawn.getX() + level.getRandom().nextInt(range * 2 + 1) - range;
-            int z = spawn.getZ() + level.getRandom().nextInt(range * 2 + 1) - range;
+            int x = center.getX() + level.getRandom().nextInt(range * 2 + 1) - range;
+            int z = center.getZ() + level.getRandom().nextInt(range * 2 + 1) - range;
             int y = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(x, 0, z)).getY() + 1;
             BlockPos pos = new BlockPos(x, y, z);
             if (isSafe(level, pos)) {
                 return pos;
             }
         }
-        // 尝试失败，回退到出生点上方
-        BlockPos fallback = spawn.above(2);
-        return isSafe(level, fallback) ? fallback : spawn;
+        // 尝试失败，回退到中心点上方
+        BlockPos fallback = center.above(2);
+        return isSafe(level, fallback) ? fallback : center;
     }
 
     /** 按维度 key 获取服务端世界。 */

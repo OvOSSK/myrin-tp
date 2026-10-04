@@ -9,6 +9,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -32,6 +33,7 @@ public class MyrinConfigScreen extends Screen {
     private boolean deathBack;
 
     private ConfigList list;
+    private final List<Button> modeButtons = new ArrayList<>();
 
     public MyrinConfigScreen(Screen parent) {
         super(Component.literal("Myrin TP 设置"));
@@ -53,12 +55,15 @@ public class MyrinConfigScreen extends Screen {
     @Override
     protected void init() {
         int x = this.width / 2 - 170;
+        modeButtons.clear();
         for (int i = 0; i < 4; i++) {
             final int m = i;
             int bx = x + i * 122;
-            addRenderableWidget(Button.builder(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")),
-                    b -> { mode = m; rebuild(); })
-                    .bounds(bx, 34, 110, 20).build());
+            Button b = Button.builder(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")),
+                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); rebuild(); })
+                    .bounds(bx, 34, 110, 20).build();
+            modeButtons.add(b);
+            addRenderableWidget(b);
         }
 
         int listTop = 62;
@@ -80,14 +85,14 @@ public class MyrinConfigScreen extends Screen {
             return;
         }
         list.clearAll();
-        list.add(new NumEntry("tpa 请求冷却(秒)", tpaCooldown, 5, v -> tpaCooldown = v));
-        list.add(new NumEntry("tpa 请求超时(秒)", tprTimeout, 5, v -> tprTimeout = v));
-        list.add(new NumEntry("回家冷却(秒)", homeCooldown, 5, v -> homeCooldown = v));
-        list.add(new NumEntry("返回冷却(秒)", backCooldown, 5, v -> backCooldown = v));
-        list.add(new NumEntry("随机传送冷却(秒)", tprCooldown, 5, v -> tprCooldown = v));
-        list.add(new NumEntry("传送倒计时(刻)", delay, 5, v -> delay = v));
-        list.add(new NumEntry("随机传送范围", tprRange, 500, v -> tprRange = v));
-        list.add(new NumEntry("家点数量上限", maxHomes, 1, v -> maxHomes = v));
+        list.add(new SliderEntry("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v));
+        list.add(new SliderEntry("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v));
+        list.add(new SliderEntry("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v));
+        list.add(new SliderEntry("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v));
+        list.add(new SliderEntry("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v));
+        list.add(new SliderEntry("传送倒计时(刻)", delay, 0, 200, v -> delay = v));
+        list.add(new SliderEntry("随机传送范围", tprRange, 100, 200000, v -> tprRange = v));
+        list.add(new SliderEntry("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v));
         list.add(new ToggleEntry("倒计时期间移动取消", cancelOnMove, v -> cancelOnMove = v));
         list.add(new ToggleEntry("/back 优先回死亡点", deathBack, v -> deathBack = v));
     }
@@ -95,6 +100,12 @@ public class MyrinConfigScreen extends Screen {
     private void rebuild() {
         if (list != null) {
             rebuildList();
+        }
+    }
+
+    private void refreshModeButtons() {
+        for (int i = 0; i < modeButtons.size(); i++) {
+            modeButtons.get(i).setMessage(Component.literal("模式 " + i + (mode == i ? "(当前)" : "")));
         }
     }
 
@@ -116,10 +127,10 @@ public class MyrinConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        renderBackground(g);
+        g.fill(0, 0, this.width, this.height, 0xFF111111);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
-        g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 62, 0xFF888888);
+        g.drawString(this.font, "模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。", x, this.height - 62, 0xFFAAAAAA);
         super.render(g, mx, my, pt);
     }
 
@@ -128,32 +139,18 @@ public class MyrinConfigScreen extends Screen {
         this.minecraft.setScreen(parent);
     }
 
-    /** 参数行：- 值标签 + */
-    private final class NumEntry extends ContainerObjectSelectionList.Entry<NumEntry> {
-        private final Button minus;
-        private final Button plus;
-        private final String label;
-        private int value;
-        private final Consumer<Integer> setter;
+    /** 参数行：可拖动滑块调节数值 */
+    private final class SliderEntry extends ContainerObjectSelectionList.Entry<SliderEntry> {
+        private final Slider slider;
 
-        NumEntry(String label, int value, int step, Consumer<Integer> setter) {
-            this.label = label;
-            this.value = value;
-            this.setter = setter;
-            this.minus = Button.builder(Component.literal("-" + step), b -> change(-step)).bounds(0, 0, 40, 20).build();
-            this.plus = Button.builder(Component.literal("+" + step), b -> change(step)).bounds(0, 0, 40, 20).build();
-        }
-
-        private void change(int delta) {
-            int nv = Math.max(0, value + delta);
-            value = nv;
-            setter.accept(nv);
-            rebuildList();
+        SliderEntry(String label, int value, int min, int max, Consumer<Integer> setter) {
+            double v = max <= min ? 0.0 : (double) (value - min) / (double) (max - min);
+            this.slider = new Slider(label, min, max, v, setter);
         }
 
         @Override
         public List<? extends GuiEventListener> children() {
-            return List.of(minus, plus);
+            return List.of(slider);
         }
 
         @Override
@@ -163,13 +160,41 @@ public class MyrinConfigScreen extends Screen {
 
         @Override
         public void render(GuiGraphics g, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float pt) {
-            minus.setX(left);
-            minus.setY(top);
-            plus.setX(left + 210);
-            plus.setY(top);
-            minus.render(g, mouseX, mouseY, pt);
-            plus.render(g, mouseX, mouseY, pt);
-            g.drawString(font, label + ": " + value, left + 46, top + 6, 0xFFAAAAAA);
+            slider.setX(left);
+            slider.setY(top);
+            slider.setWidth(340);
+            slider.render(g, mouseX, mouseY, pt);
+        }
+
+        /** 拖动滑块即时更新数值变量，保存时统一落盘 */
+        private final class Slider extends AbstractSliderButton {
+            private final String label;
+            private final int min;
+            private final int max;
+            private final Consumer<Integer> setter;
+
+            Slider(String label, int min, int max, double value, Consumer<Integer> setter) {
+                super(0, 0, 340, 20, Component.literal(label), value);
+                this.label = label;
+                this.min = min;
+                this.max = max;
+                this.setter = setter;
+                updateMessage();
+            }
+
+            @Override
+            protected void updateMessage() {
+                setMessage(Component.literal(label + ": " + current()));
+            }
+
+            @Override
+            protected void applyValue() {
+                setter.accept(current());
+            }
+
+            private int current() {
+                return min + (int) Math.round((max - min) * value);
+            }
         }
     }
 

@@ -4,7 +4,8 @@
   "package": "com.myrin.tp.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ForgeHooksMixin"
+    "ForgeHooksMixin",
+    "EntitySelectorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
