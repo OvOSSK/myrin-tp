@@ -36,7 +36,7 @@ public final class CommandBlocker {
             // 模式 0：恢复原版 /tp /teleport 权限（非 OP 不可用），其余指令不限制
             if (MyrinTPMod.CONFIG.mode == 0
                     && ("tp".equals(cmd) || "teleport".equals(cmd))
-                    && !isOp(src)) {
+                    && !guard.isOp(src)) {
                 src.sendFailure(Component.literal("你没有权限使用此命令"));
                 return true;
             }
@@ -51,20 +51,6 @@ public final class CommandBlocker {
         } catch (Exception e) {
             System.err.println("[myrintp] 指令管控判定异常，按禁止处理：" + e);
             return true;
-        }
-    }
-
-    private static boolean isOp(CommandSourceStack src) {
-        try {
-            if (src.hasPermission(2) || src.hasPermission(3) || src.hasPermission(4)) {
-                return true;
-            }
-            if (src.getEntity() instanceof ServerPlayer p) {
-                return p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4);
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
         }
     }
 

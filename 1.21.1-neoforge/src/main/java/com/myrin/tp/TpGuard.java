@@ -64,16 +64,21 @@ public final class TpGuard {
                 return true;
             }
         }
-        // OP 判定：hasPermission 为“大于等于”语义，多级保险覆盖各版本差异
-        boolean isOp = src.hasPermission(2) || src.hasPermission(3) || src.hasPermission(4);
-        if (!isOp && src.getEntity() instanceof ServerPlayer p) {
-            isOp = p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4);
-        }
+        boolean isOp = isOp(src);
         return switch (mode) {
             case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
             case 2 -> !isOp;   // 管理员仅TP：管理员只能 TP
             case 3 -> false;   // 全部仅TP：任何人只能 TP
             default -> true;
         };
+    }
+
+    /** OP 判定：hasPermission 为“大于等于”语义，多级保险覆盖各版本差异。 */
+    public boolean isOp(CommandSourceStack src) {
+        boolean op = src.hasPermission(2) || src.hasPermission(3) || src.hasPermission(4);
+        if (!op && src.getEntity() instanceof ServerPlayer p) {
+            op = p.hasPermissions(2) || p.hasPermissions(3) || p.hasPermissions(4);
+        }
+        return op;
     }
 }

@@ -66,18 +66,23 @@ public final class TpGuard {
                 return true;
             }
         }
-        // OP 判定：先按命令源权限集，再按服务器 OP 列表兜底
-        boolean isOp = src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))
-                || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS))
-                || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS));
-        if (!isOp && src.getEntity() instanceof ServerPlayer p) {
-            isOp = src.getServer().getPlayerList().isOp(p.nameAndId());
-        }
+        boolean isOp = isOp(src);
         return switch (mode) {
             case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
             case 2 -> !isOp;   // 管理员仅TP：管理员只能 TP
             case 3 -> false;   // 全部仅TP：任何人只能 TP
             default -> true;
         };
+    }
+
+    /** OP 判定：先按命令源权限集，再按服务器 OP 列表兜底。 */
+    public boolean isOp(CommandSourceStack src) {
+        boolean op = src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))
+                || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS))
+                || src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS));
+        if (!op && src.getEntity() instanceof ServerPlayer p) {
+            op = src.getServer().getPlayerList().isOp(p.nameAndId());
+        }
+        return op;
     }
 }
