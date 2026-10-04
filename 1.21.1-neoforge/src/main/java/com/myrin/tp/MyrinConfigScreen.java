@@ -58,36 +58,42 @@ public class MyrinConfigScreen extends Screen {
     @Override
     protected void init() {
         int x = this.width / 2 - 170;
+        int rows = 10;
+        int bottomY = this.height - 28;
+        int step = Math.max(12, Math.min(24, (bottomY - 66) / rows));
+        int ctrlH = Math.min(20, step);
+        int topY = Math.max(66, (bottomY - 20 - rows * step) / 2);
+
         modeButtons.clear();
         for (int i = 0; i < 4; i++) {
             final int m = i;
             Button b = Button.builder(modeLabel(i),
                     btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); })
-                    .bounds(x + i * 100, 34, 90, 20).build();
+                    .bounds(x + i * 100, 30, 90, 18).build();
             modeButtons.add(b);
             addRenderableWidget(b);
         }
 
-        int y = 62;
-        addSlider("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v, x, y); y += 24;
-        addSlider("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v, x, y); y += 24;
-        addSlider("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v, x, y); y += 24;
-        addSlider("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v, x, y); y += 24;
-        addSlider("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v, x, y); y += 24;
-        addSlider("传送倒计时(刻)", delay, 0, 200, v -> delay = v, x, y); y += 24;
-        addSlider("随机传送范围", tprRange, 100, 200000, v -> tprRange = v, x, y); y += 24;
-        addSlider("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v, x, y); y += 24;
+        int y = topY;
+        addSlider("tpa 请求冷却(秒)", tpaCooldown, 0, 3600, v -> tpaCooldown = v, x, y, ctrlH); y += step;
+        addSlider("tpa 请求超时(秒)", tprTimeout, 5, 300, v -> tprTimeout = v, x, y, ctrlH); y += step;
+        addSlider("回家冷却(秒)", homeCooldown, 0, 3600, v -> homeCooldown = v, x, y, ctrlH); y += step;
+        addSlider("返回冷却(秒)", backCooldown, 0, 3600, v -> backCooldown = v, x, y, ctrlH); y += step;
+        addSlider("随机传送冷却(秒)", tprCooldown, 0, 3600, v -> tprCooldown = v, x, y, ctrlH); y += step;
+        addSlider("传送倒计时(刻)", delay, 0, 200, v -> delay = v, x, y, ctrlH); y += step;
+        addSlider("随机传送范围", tprRange, 100, 200000, v -> tprRange = v, x, y, ctrlH); y += step;
+        addSlider("家点数量上限", maxHomes, 1, 100, v -> maxHomes = v, x, y, ctrlH); y += step;
 
         toggleMove = Button.builder(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关")),
                 b -> { cancelOnMove = !cancelOnMove; b.setMessage(Component.literal("倒计时期间移动取消: " + (cancelOnMove ? "开" : "关"))); })
-                .bounds(x, y, 340, 20).build();
-        addRenderableWidget(toggleMove); y += 24;
+                .bounds(x, y, 340, ctrlH).build();
+        addRenderableWidget(toggleMove); y += step;
         toggleBack = Button.builder(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关")),
                 b -> { deathBack = !deathBack; b.setMessage(Component.literal("/back 优先回死亡点: " + (deathBack ? "开" : "关"))); })
-                .bounds(x, y, 340, 20).build();
+                .bounds(x, y, 340, ctrlH).build();
         addRenderableWidget(toggleBack);
 
-        int by = this.height - 32;
+        int by = this.height - 28;
         addRenderableWidget(Button.builder(Component.literal("保存"), b -> save()).bounds(x, by, 120, 20).build());
         addRenderableWidget(Button.builder(Component.literal("取消"), b -> onClose()).bounds(x + 132, by, 120, 20).build());
     }
@@ -102,9 +108,9 @@ public class MyrinConfigScreen extends Screen {
         }
     }
 
-    private void addSlider(String label, int value, int min, int max, Consumer<Integer> setter, int x, int y) {
+    private void addSlider(String label, int value, int min, int max, Consumer<Integer> setter, int x, int y, int h) {
         double v = max <= min ? 0.0 : (double) (value - min) / (double) (max - min);
-        addRenderableWidget(new AbstractSliderButton(x, y, 340, 20, Component.literal(label + ": " + value), v) {
+        addRenderableWidget(new AbstractSliderButton(x, y, 340, h, Component.literal(label + ": " + value), v) {
             @Override
             protected void updateMessage() {
                 setMessage(Component.literal(label + ": " + (min + (int) Math.round((max - min) * value))));
@@ -137,8 +143,10 @@ public class MyrinConfigScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float pt) {
         g.fill(0, 0, this.width, this.height, 0xFF111111);
         int x = this.width / 2 - 170;
-        g.drawString(this.font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 16, 0xFFFFFFFF);
-        g.drawString(this.font, Component.literal("模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。"), x, this.height - 62, 0xFFAAAAAA);
+        g.drawString(this.font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 12, 0xFFFFFFFF);
+        if (this.height >= 260) {
+            g.drawString(this.font, Component.literal("模式点击立即生效；参数拖动调节，保存后生效（多人请由服主设置）。"), x, 52, 0xFFAAAAAA);
+        }
         super.render(g, mx, my, pt);
     }
 
