@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="myrintp.png" width="96" alt="MYRIN TP" />
+<img src="myrintp.jpg" width="96" alt="MYRIN TP" />
 
 # MYRIN TP
 
