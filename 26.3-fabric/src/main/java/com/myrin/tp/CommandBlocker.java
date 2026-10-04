@@ -12,6 +12,16 @@ import net.minecraft.server.level.ServerPlayer;
  */
 public final class CommandBlocker {
 
+    /** F3+F4 快捷切换模式走数据包/命令路径，按管控模式判定是否禁止（等价于 /gamemode）。 */
+    public static boolean shouldBlockGameModeSwitch(ServerPlayer player) {
+        try {
+            return !MyrinTPMod.GUARD.allows(player.createCommandSourceStack(), "gamemode");
+        } catch (Exception e) {
+            System.err.println("[myrintp] 模式切换管控判定异常，按禁止处理：" + e);
+            return true;
+        }
+    }
+
     private CommandBlocker() {
     }
 

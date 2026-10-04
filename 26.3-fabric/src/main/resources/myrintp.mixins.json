@@ -3,7 +3,8 @@
   "package": "com.myrin.tp.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CommandsMixin"
+    "CommandsMixin",
+    "GameModePacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1

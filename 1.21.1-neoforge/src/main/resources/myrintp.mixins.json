@@ -6,7 +6,8 @@
   "mixins": [
     "CommonHooksMixin",
     "EntitySelectorParserMixin",
-    "EntitySelectorMixin"
+    "EntitySelectorMixin",
+    "GameModePacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1
