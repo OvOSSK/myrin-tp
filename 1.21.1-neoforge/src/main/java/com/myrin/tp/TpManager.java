@@ -77,7 +77,7 @@ public final class TpManager {
         cooldownReadyAt.computeIfAbsent(p.getUUID(), k -> new HashMap<>()).put(key, System.currentTimeMillis() + seconds * 1000L);
     }
 
-    private long remainingCooldown(ServerPlayer p, String key) {
+    private long remainingCooldown(ServerPlayer p, String key, int configuredSeconds) {
         Long ready = cooldownReadyAt.getOrDefault(p.getUUID(), Map.of()).get(key);
         if (ready == null) {
             return 0;
@@ -86,11 +86,15 @@ public final class TpManager {
         if (remain <= 0) {
             return 0;
         }
+        // 配置改短：剩余超过新配置时长时视为已冷却，下次使用按新配置重新计时
+        if (configuredSeconds >= 0 && remain > configuredSeconds * 1000L) {
+            return 0;
+        }
         return remain;
     }
 
     private boolean cooldownCheck(ServerPlayer p, String key, int seconds) {
-        long remain = remainingCooldown(p, key);
+        long remain = remainingCooldown(p, key, seconds);
         if (remain > 0) {
             err(p, "操作冷却中，剩余 " + (remain / 1000 + 1) + " 秒。");
             return false;
