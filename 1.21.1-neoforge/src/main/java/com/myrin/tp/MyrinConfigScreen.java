@@ -116,7 +116,7 @@ public class MyrinConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        renderBackground(g, mouseX, mouseY, partialTick);
+        renderBackground(g, mx, my, pt);
         int x = this.width / 2 - 170;
         g.drawString(this.font, "指令管控：0 不限制 / 1 玩家仅TP / 2 管理员仅TP / 3 全部仅TP", x, 18, 0xFFFFFFFF);
         g.drawString(this.font, "修改立即生效；多人模式请由服主在服务端设置。", x, this.height - 62, 0xFF888888);
