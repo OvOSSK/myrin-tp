@@ -9,7 +9,7 @@
 Forge 1.20.1 ・ NeoForge 1.21.1 ・ Fabric 26.3
 
 [![Build](https://github.com/OvOSSK/myrin-tp/actions/workflows/build-release.yml/badge.svg)](https://github.com/OvOSSK/myrin-tp/actions)
-![Version](https://img.shields.io/badge/version-v1.3.0-blue)
+![Version](https://img.shields.io/badge/version-v1.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
@@ -212,7 +212,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 26.3-fabric      JDK 25 + Gradle 9.8.0
 ```
 
-推送 `main` 并打 tag（如 `v1.3.0`）即触发构建，产物自动发布到 [Releases](https://github.com/OvOSSK/myrin-tp/releases)，文件名为 `myrin-tp-<版本>-<加载器>-<时间戳>.jar`。
+推送 `main` 并打 tag（如 `v1.3.1`）即触发构建，产物自动发布到 [Releases](https://github.com/OvOSSK/myrin-tp/releases)，文件名为 `myrin-tp-<版本>-<加载器>-<时间戳>.jar`。
 
 本地构建：进入对应子工程目录执行 `./gradlew build`（需匹配对应 JDK）。
 
