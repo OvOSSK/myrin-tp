@@ -1,28 +1,23 @@
 package com.myrin.tp;
 
-import net.fabricmc.fabric.api.networking.v1.CustomPacketPayload;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 /** 服务器→客户端：配置与权限状态（canEdit + 服务器当前配置 JSON）。 */
 public record ConfigStatusPacket(boolean canEdit, String json) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Id<ConfigStatusPacket> ID = new CustomPacketPayload.Id<>(ResourceLocation.fromNamespaceAndPath("myrintp", "config_status"));
+    public static final CustomPacketPayload.Type<ConfigStatusPacket> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("myrintp", "config_status"));
 
-    public static final PacketCodec<RegistryByteBuf, ConfigStatusPacket> CODEC = PacketCodec.of(ConfigStatusPacket::write, ConfigStatusPacket::read);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConfigStatusPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL, ConfigStatusPacket::canEdit,
+            ByteBufCodecs.STRING_UTF8, ConfigStatusPacket::json,
+            ConfigStatusPacket::new);
 
     @Override
-    public CustomPacketPayload.Id<? extends CustomPacketPayload> id() {
-        return ID;
-    }
-
-    private static void write(ConfigStatusPacket pkt, RegistryByteBuf buf) {
-        buf.writeBoolean(pkt.canEdit);
-        buf.writeUtf(pkt.json);
-    }
-
-    private static ConfigStatusPacket read(RegistryByteBuf buf) {
-        return new ConfigStatusPacket(buf.readBoolean(), buf.readUtf(32767));
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

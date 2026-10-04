@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  */
 public class MyrinConfigScreen extends Screen {
     private final Screen parent;
-    private final Config cfg;
+    private Config cfg;
     private int mode;
     private int tpaCooldown;
     private int tprTimeout;

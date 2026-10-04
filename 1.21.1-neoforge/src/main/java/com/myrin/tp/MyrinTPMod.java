@@ -100,7 +100,7 @@ public final class MyrinTPMod {
             ctx.enqueueWork(() -> {
                 ServerPlayer player = ctx.getSender();
                 if (player != null) {
-                    onConfigSync(player, pkt.type(), pkt.json());
+                    onConfigSync(player, pkt.kind(), pkt.json());
                 }
             });
         });

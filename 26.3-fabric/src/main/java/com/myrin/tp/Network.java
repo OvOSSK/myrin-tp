@@ -14,18 +14,18 @@ public final class Network {
     }
 
     public static void register() {
-        PayloadTypeRegistry.playC2S().register(ConfigSyncPacket.ID, ConfigSyncPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(ConfigStatusPacket.ID, ConfigStatusPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(ConfigStatusPacket.TYPE, ConfigStatusPacket.STREAM_CODEC);
 
-        ServerPlayNetworking.registerGlobalReceiver(ConfigSyncPacket.ID, (payload, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(ConfigSyncPacket.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
             if (player != null) {
-                context.server().execute(() -> MyrinTPMod.onConfigSync(player, payload.type(), payload.json()));
+                context.server().execute(() -> MyrinTPMod.onConfigSync(player, payload.kind(), payload.json()));
             }
         });
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ClientPlayNetworking.registerGlobalReceiver(ConfigStatusPacket.ID, (payload, context) -> {
+            ClientPlayNetworking.registerGlobalReceiver(ConfigStatusPacket.TYPE, (payload, context) -> {
                 context.client().execute(() -> {
                     MyrinConfigScreen screen = MyrinConfigScreen.active;
                     if (screen != null) {
@@ -36,7 +36,7 @@ public final class Network {
         }
     }
 
-    /** 客户端→服务器发送（需客户端环境）。 */
+    /** 客户端→服务器发送。 */
     public static void sendToServer(ConfigSyncPacket pkt) {
         ClientPlayNetworking.send(pkt);
     }

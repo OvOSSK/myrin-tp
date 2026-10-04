@@ -1,28 +1,23 @@
 package com.myrin.tp;
 
-import net.fabricmc.fabric.api.networking.v1.CustomPacketPayload;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 /** 客户端→服务器：0=查询配置与权限，1=提交新配置。 */
-public record ConfigSyncPacket(int type, String json) implements CustomPacketPayload {
+public record ConfigSyncPacket(int kind, String json) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Id<ConfigSyncPacket> ID = new CustomPacketPayload.Id<>(ResourceLocation.fromNamespaceAndPath("myrintp", "config_sync"));
+    public static final CustomPacketPayload.Type<ConfigSyncPacket> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("myrintp", "config_sync"));
 
-    public static final PacketCodec<RegistryByteBuf, ConfigSyncPacket> CODEC = PacketCodec.of(ConfigSyncPacket::write, ConfigSyncPacket::read);
+    public static final StreamCodec<FriendlyByteBuf, ConfigSyncPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, ConfigSyncPacket::kind,
+            ByteBufCodecs.STRING_UTF8, ConfigSyncPacket::json,
+            ConfigSyncPacket::new);
 
     @Override
-    public CustomPacketPayload.Id<? extends CustomPacketPayload> id() {
-        return ID;
-    }
-
-    private static void write(ConfigSyncPacket pkt, RegistryByteBuf buf) {
-        buf.writeVarInt(pkt.type);
-        buf.writeUtf(pkt.json);
-    }
-
-    private static ConfigSyncPacket read(RegistryByteBuf buf) {
-        return new ConfigSyncPacket(buf.readVarInt(), buf.readUtf(32767));
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
