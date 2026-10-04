@@ -78,7 +78,7 @@ public final class TpManager {
     }
 
     private long remainingCooldown(ServerPlayer p, String key, int configuredSeconds) {
-        Long ready = cooldownReadyAt.getOrDefault(p.getUUID(), Map.of()).get(key);
+        Long ready = cooldownReadyAt.getOrDefault(p.getUUID(), java.util.Collections.emptyMap()).get(key);
         if (ready == null) {
             return 0;
         }
@@ -371,7 +371,7 @@ public final class TpManager {
     }
 
     private java.nio.file.Path dataFile() {
-        return MyrinTPMod.CONFIG_DIR.resolve("data.json");
+        return MyrinTPMod.DATA_FILE;
     }
 
     /**

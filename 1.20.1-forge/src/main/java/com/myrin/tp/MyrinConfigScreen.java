@@ -16,10 +16,6 @@ import java.util.function.Consumer;
  * 所有行完整显示，纯色背景，适配原版与钠界面缩放。
  */
 public class MyrinConfigScreen extends Screen {
-    private static final String[] MODE_LABELS = {
-            "关闭模组功能", "非OP玩家仅允许TP指令", "OP玩家禁止非TP指令", "同时启用"
-    };
-
     private final Screen parent;
     private final Config cfg;
     private int mode;
@@ -68,7 +64,7 @@ public class MyrinConfigScreen extends Screen {
         for (int i = 0; i < 4; i++) {
             final int m = i;
             Button b = Button.builder(modeLabel(i),
-                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json")); refreshModeButtons(); })
+                    btn -> { mode = m; cfg.mode = m; cfg.save(MyrinTPMod.CONFIG_FILE); refreshModeButtons(); })
                     .bounds(x + i * 100, 30, 90, 18).build();
             modeButtons.add(b);
             addRenderableWidget(b);
@@ -135,7 +131,7 @@ public class MyrinConfigScreen extends Screen {
         cfg.maxHomes = maxHomes;
         cfg.cancelOnMove = cancelOnMove;
         cfg.deathBack = deathBack;
-        cfg.save(MyrinTPMod.CONFIG_DIR.resolve("config.json"));
+        cfg.save(MyrinTPMod.CONFIG_FILE);
         onClose();
     }
 

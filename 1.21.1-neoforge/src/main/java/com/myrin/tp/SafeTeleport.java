@@ -5,8 +5,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.CactusBlock;
@@ -101,7 +103,7 @@ public final class SafeTeleport {
     }
 
     /** 按维度 key 获取服务端世界。 */
-    public static ServerLevel levelByKey(net.minecraft.server.MinecraftServer server, String dimension) {
+    public static ServerLevel levelByKey(MinecraftServer server, String dimension) {
         try {
             ResourceKey<net.minecraft.world.level.Level> key = ResourceKey.create(Registries.DIMENSION, ResourceLocation.tryParse(dimension));
             ServerLevel level = server.getLevel(key);

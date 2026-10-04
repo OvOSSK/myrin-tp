@@ -237,7 +237,7 @@ public final class MyrinCommands {
     }
 
     private static java.nio.file.Path configFile() {
-        return MyrinTPMod.CONFIG_DIR.resolve("config.json");
+        return MyrinTPMod.CONFIG_FILE;
     }
 
     private static void saveConfig() {

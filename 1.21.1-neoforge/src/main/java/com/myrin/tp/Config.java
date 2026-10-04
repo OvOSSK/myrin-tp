@@ -2,6 +2,7 @@ package com.myrin.tp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -15,6 +16,9 @@ import java.util.List;
  * 配置文件（JSON），缺失字段自动补默认值。
  */
 public final class Config {
+
+    private static final Gson GSON = new Gson();
+    private static final Gson PRETTY = new GsonBuilder().setPrettyPrinting().create();
 
     /** 0=不限制 1=玩家仅TP 2=管理员仅TP 3=全部仅TP */
     public int mode = 0;
@@ -55,7 +59,7 @@ public final class Config {
         if (Files.exists(file)) {
             try {
                 String json = Files.readString(file, StandardCharsets.UTF_8);
-                JsonObject obj = new Gson().fromJson(json, JsonObject.class);
+                JsonObject obj = GSON.fromJson(json, JsonObject.class);
                 if (obj != null) {
                     if (obj.has("mode")) cfg.mode = obj.get("mode").getAsInt();
                     if (obj.has("blacklistMode1")) cfg.blacklistMode1 = strList(obj.getAsJsonArray("blacklistMode1"));
@@ -81,7 +85,7 @@ public final class Config {
         return cfg;
     }
 
-    private static List<String> strList(com.google.gson.JsonArray arr) {
+    private static List<String> strList(JsonArray arr) {
         List<String> out = new ArrayList<>();
         if (arr == null) return out;
         arr.forEach(e -> out.add(e.getAsString()));
@@ -89,8 +93,7 @@ public final class Config {
     }
 
     public void save(Path file) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(toJson());
+        String json = PRETTY.toJson(toJson());
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, json, StandardCharsets.UTF_8);
@@ -102,9 +105,9 @@ public final class Config {
     private JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("mode", mode);
-        o.add("blacklistMode1", new Gson().toJsonTree(blacklistMode1));
-        o.add("blacklistMode2", new Gson().toJsonTree(blacklistMode2));
-        o.add("whitelistMode2", new Gson().toJsonTree(whitelistMode2));
+        o.add("blacklistMode1", GSON.toJsonTree(blacklistMode1));
+        o.add("blacklistMode2", GSON.toJsonTree(blacklistMode2));
+        o.add("whitelistMode2", GSON.toJsonTree(whitelistMode2));
         o.addProperty("tpaRequestCooldownSeconds", tpaRequestCooldownSeconds);
         o.addProperty("tpaRequestTimeoutSeconds", tpaRequestTimeoutSeconds);
         o.addProperty("homeCooldownSeconds", homeCooldownSeconds);

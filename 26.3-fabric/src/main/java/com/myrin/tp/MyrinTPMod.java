@@ -19,6 +19,8 @@ public final class MyrinTPMod implements ModInitializer {
     public static final String MODID = "myrintp";
 
     public static Path CONFIG_DIR;
+    public static Path CONFIG_FILE;
+    public static Path DATA_FILE;
     public static Config CONFIG;
     public static DataStore DATA;
     public static TpManager TP;
@@ -29,8 +31,10 @@ public final class MyrinTPMod implements ModInitializer {
     @Override
     public void onInitialize() {
         CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("myrintp");
-        CONFIG = Config.load(CONFIG_DIR.resolve("config.json"));
-        DATA = DataStore.load(CONFIG_DIR.resolve("data.json"));
+        CONFIG_FILE = CONFIG_DIR.resolve("config.json");
+        DATA_FILE = CONFIG_DIR.resolve("data.json");
+        CONFIG = Config.load(CONFIG_FILE);
+        DATA = DataStore.load(DATA_FILE);
         GUARD = new TpGuard(CONFIG);
         SelectorUnlock.init();
 
@@ -48,7 +52,7 @@ public final class MyrinTPMod implements ModInitializer {
             if (TP != null) {
                 TP.shutdown();
             }
-            DATA.save(CONFIG_DIR.resolve("data.json"));
+            DATA.save(DATA_FILE);
         });
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
