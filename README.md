@@ -124,14 +124,14 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 | 0 | 玩家加 tpa 工具 | 不禁用任何指令；玩家获得 `/tpa` `/tpahere` `/tpaccept` 等传送请求指令（非 OP 仍不可用原版 `/tp`） |
 | 1 | 玩家开 tp 权限 | 在模式 0 基础上，玩家开放原版 `/tp`（`/tp` `/teleport` 对玩家可用） |
 | 2 | 管理禁作弊 | 仅 OP 被禁用 `give`、`gamemode`、`F3+F4` 快捷切换；其他指令不限制 |
-| 3 | 所有人仅 tp | 所有人仅可用原版 `/tp` `/teleport`；不开放 tpa 工具，也不开放其他指令 |
+| 3 | 除作弊外全开放 | tpa 工具、原版 `/tp` 与原版非作弊指令全部可用；仅禁 `give` `gamemode` `F3+F4` |
 
 **规则说明**
 
-- **tpa 工具**：`tpa` `tpahere` `tpyes` `tpaccept` `tpno` `tpdeny` `tpcancel` `tplist`、`sethome` `home` `homes` `delhome` `renamehome`、`back` `tpr` `rtp`（模式 0/1/2 对玩家开放，模式 3 关闭）
+- **tpa 工具**：`tpa` `tpahere` `tpyes` `tpaccept` `tpno` `tpdeny` `tpcancel` `tplist`、`sethome` `home` `homes` `delhome` `renamehome`、`back` `tpr` `rtp`（模式 0/1/2/3 对玩家开放）
 - **原版传送**：`tp` `teleport`（模式 1/3 对玩家开放，模式 0/2 仍为 OP 指令）
 - 被禁止的指令执行时会收到红字提示，**指令补全保留**（不删除补全，仅执行时拦截）
-- `F3+F4` 快捷切换创造 / 生存等模式按模式 2 管控判定（等价于 `/gamemode`）
+- `F3+F4` 快捷切换创造 / 生存等模式按 `/gamemode` 判定：模式 2 仅拦 OP，模式 3 人人拦截
 
 ---
 
@@ -181,7 +181,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 **模式 0 下为什么非 OP 不能使用 `/tp`？**
 
-模式 0 恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用，玩家改用 `/tpa` 等传送请求指令。需要对玩家开放原版 `/tp` 时切换到模式 1，或使用模式 3（所有人仅 `/tp`）。
+模式 0 恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用，玩家改用 `/tpa` 等传送请求指令。需要对玩家开放原版 `/tp` 时切换到模式 1；若想人人可用除作弊外的全部指令（含 tpa、tp、原版基础指令），用模式 3。
 
 **随机传送为什么落点总是原地或范围很小？**
 
