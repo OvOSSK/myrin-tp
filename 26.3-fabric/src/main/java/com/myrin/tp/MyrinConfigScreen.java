@@ -153,7 +153,7 @@ public class MyrinConfigScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor ex, int mx, int my, float pt) {
         ex.fill(0, 0, this.width, this.height, 0xFF111111);
         int x = this.width / 2 - 170;
-        ex.text(font, Component.literal("指令管控：0关闭 / 1非OP仅TP / 2OP禁非TP / 3同时启用"), x, 12, 0xFFFFFFFF);
+        ex.text(font, Component.literal("指令管控：0玩家加tpa工具 / 1玩家开tp权限 / 2管理禁作弊 / 3所有人仅tp"), x, 12, 0xFFFFFFFF);
         super.extractRenderState(ex, mx, my, pt);
     }
 

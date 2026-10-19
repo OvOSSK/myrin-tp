@@ -10,14 +10,14 @@ import java.util.Set;
 /**
  * 指令管控决策逻辑（无 Mixin、无作弊）：
  * <p>
- * mode 0 = 不限制
- * mode 1 = 玩家仅可使用 TP 类指令（模式一黑名单豁免），管理员不受限
- * mode 2 = 管理员仅可使用 TP 类指令（模式二黑名单豁免 + 白名单），普通玩家不受限
- * mode 3 = 任何人仅可使用 TP 类指令（黑名单豁免）
+ * mode 0 = 不禁用任何指令；玩家获得 tpa 工具（tpa/tpahere/tpaccept 等传送请求指令）
+ * mode 1 = 在模式0基础上，玩家开放 tp 权限（/tp 对玩家可用）
+ * mode 2 = 管理（OP）禁用部分作弊功能：give、gamemode、F3+F4 快捷；其他指令不禁
+ * mode 3 = 所有人仅 tp（仅 /tp 可用，无 tpa 工具、不开放其他指令）
  */
 public final class TpGuard {
 
-    /** TP 类指令（含原版 /tp /teleport 与模组传送指令），任何模式下都放行 */
+    /** TP 类指令（含原版 /tp /teleport 与模组传送指令），用于放开指令树补全权限 */
     public static final Set<String> TP_COMMANDS = Set.of(
             "tp", "teleport",
             "tpa", "tpahere", "tpyes", "tpaccept", "tpno", "tpdeny",
@@ -28,6 +28,12 @@ public final class TpGuard {
 
     /** 本模组管理指令，任何模式下都放行（由指令自身的 requires 控制权限） */
     public static final Set<String> MOD_COMMANDS = Set.of("mtp", "myrintp");
+
+    /** 原版 /tp /teleport：模式3下所有人仅可用这条传送；模式0/2 对非 OP 不开放 */
+    public static final Set<String> VANILLA_TP = Set.of("tp", "teleport");
+
+    /** 模式2下仅对 OP 禁用的作弊指令（F3+F4 走 gamemode 路径，一并拦截） */
+    public static final Set<String> CHEAT_COMMANDS = Set.of("give", "gamemode");
 
     private final Config config;
 
@@ -45,32 +51,11 @@ public final class TpGuard {
      */
     public boolean allows(CommandSourceStack src, String command) {
         int mode = config.mode;
-        if (mode == 0) {
-            return true;
-        }
-        if (TP_COMMANDS.contains(command) || MOD_COMMANDS.contains(command)) {
-            return true;
-        }
-        // 白名单仅在模式二/三（管理员受限）生效
-        if ((mode == 2 || mode == 3) && config.whitelistMode2.contains(command)) {
-            return true;
-        }
-        // 黑名单豁免：命中名单的玩家不受对应模式限制
-        boolean isPlayer = src.getEntity() instanceof ServerPlayer;
-        if (isPlayer) {
-            String name = ((ServerPlayer) src.getEntity()).getGameProfile().name();
-            if ((mode == 1 || mode == 3) && config.blacklistMode1.contains(name)) {
-                return true;
-            }
-            if ((mode == 2 || mode == 3) && config.blacklistMode2.contains(name)) {
-                return true;
-            }
-        }
         boolean isOp = isOp(src);
         return switch (mode) {
-            case 1 -> isOp;    // 玩家仅TP：非管理员只能 TP
-            case 2 -> !isOp;   // 管理员仅TP：管理员只能 TP
-            case 3 -> false;   // 全部仅TP：任何人只能 TP
+            case 0, 1 -> true;                                     // 不禁用任何指令（/tp 对玩家是否开放由 CommandBlocker 单独判）
+            case 2 -> !isOp || !CHEAT_COMMANDS.contains(command);  // 仅 OP 被禁 give/gamemode/F3+F4，其他指令不禁
+            case 3 -> VANILLA_TP.contains(command);              // 所有人仅 /tp
             default -> true;
         };
     }

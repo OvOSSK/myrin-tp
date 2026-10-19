@@ -121,18 +121,17 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 | 模式 | 名称 | 行为 |
 | --- | --- | --- |
-| 0 | 关闭 | 原版权限：非 OP 不可使用 `/tp` `/teleport`；其余指令不限制；模组传送指令可用 |
-| 1 | 玩家 仅 TP | 非管理员只能使用 TP 类指令 |
-| 2 | OP 禁非 TP | 管理员只能使用 TP 类指令 |
-| 3 | 同时启用 | 任何人只能使用 TP 类指令 |
+| 0 | 玩家加 tpa 工具 | 不禁用任何指令；玩家获得 `/tpa` `/tpahere` `/tpaccept` 等传送请求指令（非 OP 仍不可用原版 `/tp`） |
+| 1 | 玩家开 tp 权限 | 在模式 0 基础上，玩家开放原版 `/tp`（`/tp` `/teleport` 对玩家可用） |
+| 2 | 管理禁作弊 | 仅 OP 被禁用 `give`、`gamemode`、`F3+F4` 快捷切换；其他指令不限制 |
+| 3 | 所有人仅 tp | 所有人仅可用原版 `/tp` `/teleport`；不开放 tpa 工具，也不开放其他指令 |
 
 **规则说明**
 
-- **TP 类指令**：`tp` `teleport`、`tpa` `tpahere` `tpyes` `tpaccept` `tpno` `tpdeny` `tpcancel` `tplist`、`sethome` `home` `homes` `delhome` `renamehome`、`back` `tpr` `rtp`
-- **黑名单**：命中名单的玩家在该模式下不受限制（模式 1/3 对应 `blacklist1`，模式 2/3 对应 `blacklist2`）
-- **白名单**：仅模式 2/3 生效，名单内的指令额外放行；默认放行 `seed` `msg` `tell` `w` `help` `list` `me`
+- **tpa 工具**：`tpa` `tpahere` `tpyes` `tpaccept` `tpno` `tpdeny` `tpcancel` `tplist`、`sethome` `home` `homes` `delhome` `renamehome`、`back` `tpr` `rtp`（模式 0/1/2 对玩家开放，模式 3 关闭）
+- **原版传送**：`tp` `teleport`（模式 1/3 对玩家开放，模式 0/2 仍为 OP 指令）
 - 被禁止的指令执行时会收到红字提示，**指令补全保留**（不删除补全，仅执行时拦截）
-- `F3+F4` 快捷切换创造 / 生存等模式也按指令管控判定（等价于 `/gamemode`）
+- `F3+F4` 快捷切换创造 / 生存等模式按模式 2 管控判定（等价于 `/gamemode`）
 
 ---
 
@@ -182,7 +181,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 **模式 0 下为什么非 OP 不能使用 `/tp`？**
 
-模式 0 是「关闭管控」，即恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用。需要放开时请切换到模式 1/2/3。
+模式 0 恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用，玩家改用 `/tpa` 等传送请求指令。需要对玩家开放原版 `/tp` 时切换到模式 1，或使用模式 3（所有人仅 `/tp`）。
 
 **随机传送为什么落点总是原地或范围很小？**
 

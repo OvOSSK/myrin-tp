@@ -154,7 +154,7 @@ public final class MyrinCommands {
     private static int setMode(CommandSourceStack src, int mode) {
         MyrinTPMod.CONFIG.mode = mode;
         MyrinTPMod.CONFIG.save(configFile());
-        reply(src, "已设置指令管控为 " + mode + "（0=不限制 1=玩家仅TP 2=管理员仅TP 3=全部仅TP）。");
+        reply(src, "已设置指令管控为 " + mode + "（0=玩家增加tpa工具 1=玩家开放tp权限 2=管理禁用部分作弊 3=所有人仅tp）。");
         return 1;
     }
 

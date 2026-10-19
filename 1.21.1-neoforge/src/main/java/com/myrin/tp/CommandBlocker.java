@@ -33,15 +33,16 @@ public final class CommandBlocker {
                 return false;
             }
             String cmd = resolveName(parse);
-            // 模式 0：恢复原版 /tp /teleport 权限（非 OP 不可用），其余指令不限制
-            if (MyrinTPMod.CONFIG.mode == 0
-                    && ("tp".equals(cmd) || "teleport".equals(cmd))
+            // 模组管理指令任何模式都放行（其自身 requires 控制 OP 权限）
+            if (TpGuard.MOD_COMMANDS.contains(cmd)) {
+                return false;
+            }
+            // 非 OP 玩家的原版 /tp：仅在模式1/3 对玩家开放；模式0/2 玩家改用 tpa 工具
+            if ((MyrinTPMod.CONFIG.mode == 0 || MyrinTPMod.CONFIG.mode == 2)
+                    && TpGuard.VANILLA_TP.contains(cmd)
                     && !guard.isOp(src)) {
                 src.sendFailure(Component.literal("你没有权限使用此命令"));
                 return true;
-            }
-            if (TpGuard.MOD_COMMANDS.contains(cmd) || TpGuard.TP_COMMANDS.contains(cmd)) {
-                return false;
             }
             if (guard.allows(src, cmd)) {
                 return false;
