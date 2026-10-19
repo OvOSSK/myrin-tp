@@ -6,7 +6,7 @@
 
 **无需作弊的传送与作弊指令管控模组**
 
-Forge 1.20.1 ・ NeoForge 1.21.1 ・ Fabric 26.3
+Forge 1.18.2 ・ Forge 1.20.1 ・ NeoForge 1.21.1 ・ Fabric 26.3
 
 [![Build](https://github.com/OvOSSK/myrin-tp/actions/workflows/build-release.yml/badge.svg)](https://github.com/OvOSSK/myrin-tp/actions)
 ![Version](https://img.shields.io/badge/version-v1.3.2-blue)
@@ -14,7 +14,7 @@ Forge 1.20.1 ・ NeoForge 1.21.1 ・ Fabric 26.3
 
 </div>
 
-MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完整的传送功能，管理员可以一键切换**指令管控模式**，精确控制 `/tp` 等指令的使用范围。三个加载器版本共享同一套配置、指令与行为。（配合AI写的模组，可能存在问题，仅推荐在原版使用）
+MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完整的传送功能，管理员可以一键切换**指令管控模式**，精确控制 `/tp` 等指令的使用范围。四个加载器版本共享同一套配置、指令与行为。（配合AI写的模组，可能存在问题，仅推荐在原版使用）
 
 ---
 
@@ -51,7 +51,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 - 四档管控模式，一条命令即时切换，游戏内改动立即生效
 - 黑名单 / 白名单按模式生效，`F3+F4` 快捷切换模式也纳入管控
 
-**三端一致**
+**四端一致**
 - 同一份 `config.json` 字段与行为，Forge / NeoForge / Fabric 无差别
 - 游戏内配置界面（Fabric 走 ModMenu，Forge / NeoForge 走模组配置按钮）
 
@@ -61,6 +61,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 | 加载器 | 游戏版本 | 服务端 | 客户端 |
 | --- | --- | --- | --- |
+| Forge | 1.18.2 | ✅ | ✅（含配置界面） |
 | Forge | 1.20.1 | ✅ | ✅（含配置界面） |
 | NeoForge | 1.21.1 | ✅ | ✅（含配置界面） |
 | Fabric | 26.3 | ✅ | ✅（含 ModMenu 配置界面） |
@@ -203,9 +204,10 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 ## 从源码构建
 
-三个子工程互相独立，均由 GitHub Actions 自动构建（`build-release.yml`，三端 matrix 并行）：
+四个子工程互相独立，均由 GitHub Actions 自动构建（`build-release.yml`，四端 matrix 并行）：
 
 ```text
+1.18.2-forge     JDK 17 + Gradle 8.8
 1.20.1-forge     JDK 17 + Gradle 8.8
 1.21.1-neoforge  JDK 21 + Gradle 8.10.2
 26.3-fabric      JDK 25 + Gradle 9.8.0

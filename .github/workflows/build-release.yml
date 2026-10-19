@@ -15,6 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - dir: 1.18.2-forge
+            java: 17
+            gradle: 8.8
           - dir: 1.20.1-forge
             java: 17
             gradle: 8.8
