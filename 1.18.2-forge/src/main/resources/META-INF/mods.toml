@@ -23,6 +23,6 @@ description='''Myrin TP：传送与指令管控模组。
 [[dependencies.myrintp]]
 modId="forge"
 mandatory=true
-versionRange="[40.1.0,40.3.0)"
+versionRange="[40.1.0,)"
 ordering="NONE"
 side="BOTH"
