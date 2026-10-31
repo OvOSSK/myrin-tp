@@ -33,6 +33,7 @@ neoForge {
 
 processResources {
     inputs.property 'version', project.version
+    filteringCharset = 'UTF-8'
     filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand 'version': project.version
     }

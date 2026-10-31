@@ -152,7 +152,7 @@ public class MyrinConfigScreen extends Screen {
         g.fill(0, 0, this.width, this.height, 0xFF111111);
         super.render(g, mx, my, pt);
         int x = this.width / 2 - 170;
-        g.drawString(this.font, Component.literal("指令管控：0玩家加tpa工具 / 1玩家开tp权限 / 2管理禁作弊 / 3除作弊外全开放"), x, 12, 0xFFFFFFFF);
+        g.drawString(this.font, Component.literal("指令管控：0玩家tpa 1玩家tp 2禁管理作弊 3全开"), x, 12, 0xFFFFFFFF);
     }
 
     @Override

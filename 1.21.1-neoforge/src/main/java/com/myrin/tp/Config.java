@@ -20,7 +20,7 @@ public final class Config {
     private static final Gson GSON = new Gson();
     private static final Gson PRETTY = new GsonBuilder().setPrettyPrinting().create();
 
-    /** 0=玩家增加tpa工具 1=玩家开放tp权限 2=管理禁用部分作弊 3=除作弊外全开放 */
+    /** 0=玩家加tpa工具 1=玩家开tp权限 2=管理禁give/gamemode/F3+F4 3=全部开启 */
     public int mode = 0;
     /** 模式一黑名单：名单内玩家豁免"玩家仅TP"限制（玩家名） */
     public List<String> blacklistMode1 = new ArrayList<>();

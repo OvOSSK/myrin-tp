@@ -37,7 +37,7 @@ public final class CommandBlocker {
             if (TpGuard.MOD_COMMANDS.contains(cmd)) {
                 return false;
             }
-            // 非 OP 玩家的原版 /tp：仅在模式1/3 对玩家开放；模式0/2 玩家改用 tpa 工具
+            // 非 OP 玩家的原版 /tp：模式1/3 对玩家开放；模式0/2 玩家改用 tpa 工具
             if ((MyrinTPMod.CONFIG.mode == 0 || MyrinTPMod.CONFIG.mode == 2)
                     && TpGuard.VANILLA_TP.contains(cmd)
                     && !guard.isOp(src)) {

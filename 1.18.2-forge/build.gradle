@@ -49,6 +49,7 @@ dependencies {
 
 processResources {
     inputs.property 'version', project.version
+    filteringCharset = 'UTF-8'
     filesMatching('META-INF/mods.toml') {
         expand 'version': project.version
     }

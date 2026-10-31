@@ -11,7 +11,7 @@ import java.util.Set;
  * mode 0 = 不禁用任何指令；玩家获得 tpa 工具（tpa/tpahere/tpaccept 等传送请求指令）
  * mode 1 = 在模式0基础上，玩家开放 tp 权限（/tp 对玩家可用）
  * mode 2 = 管理（OP）禁用部分作弊功能：give、gamemode、F3+F4 快捷；其他指令不禁
- * mode 3 = 除作弊外全部指令开放：tpa 工具、原版 /tp 与原版非作弊指令人人可用，仅禁 give/gamemode/F3+F4
+ * mode 3 = 0+1+2 全部开启：tpa工具 + 玩家tp权限 + 管理禁give/gamemode/F3+F4
  */
 public final class TpGuard {
 
@@ -27,7 +27,7 @@ public final class TpGuard {
     /** 本模组管理指令，任何模式下都放行（由指令自身的 requires 控制权限） */
     public static final Set<String> MOD_COMMANDS = Set.of("mtp", "myrintp");
 
-    /** 原版 /tp /teleport：模式3下所有人仅可用这条传送；模式0/2 对非 OP 不开放 */
+    /** 原版 /tp /teleport：模式1/3 对玩家开放；模式0/2 对非 OP 不开放 */
     public static final Set<String> VANILLA_TP = Set.of("tp", "teleport");
 
     /** 模式2下仅对 OP 禁用的作弊指令（F3+F4 走 gamemode 路径，一并拦截） */
@@ -53,7 +53,7 @@ public final class TpGuard {
         return switch (mode) {
             case 0, 1 -> true;                                     // 不禁用任何指令（/tp 对玩家是否开放由 CommandBlocker 单独判）
             case 2 -> !isOp || !CHEAT_COMMANDS.contains(command);  // 仅 OP 被禁 give/gamemode/F3+F4，其他指令不禁
-            case 3 -> !CHEAT_COMMANDS.contains(command);             // 除作弊外全部指令开放（tpa、tp、原版非作弊指令人人可用）
+            case 3 -> !isOp || !CHEAT_COMMANDS.contains(command);             // 0+1+2 全开：玩家全开，管理禁give/gamemode/F3+F4
             default -> true;
         };
     }
