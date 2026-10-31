@@ -9,7 +9,7 @@
 Forge 1.18.2 ・ Forge 1.20.1 ・ NeoForge 1.21.1 ・ Fabric 26.3
 
 [![Build](https://github.com/OvOSSK/myrin-tp/actions/workflows/build-release.yml/badge.svg)](https://github.com/OvOSSK/myrin-tp/actions)
-![Version](https://img.shields.io/badge/version-v1.3.2-blue)
+![Version](https://img.shields.io/badge/version-v1.3.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
@@ -124,15 +124,15 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 | --- | --- | --- |
 | 0 | 玩家加 tpa 工具 | 不禁用任何指令；玩家获得 `/tpa` `/tpahere` `/tpaccept` 等传送请求指令（非 OP 仍不可用原版 `/tp`） |
 | 1 | 玩家开 tp 权限 | 在模式 0 基础上，玩家开放原版 `/tp`（`/tp` `/teleport` 对玩家可用） |
-| 2 | 管理禁作弊 | 仅 OP 被禁用 `give`、`gamemode`、`F3+F4` 快捷切换；其他指令不限制 |
-| 3 | 除作弊外全开放 | tpa 工具、原版 `/tp` 与原版非作弊指令全部可用；仅禁 `give` `gamemode` `F3+F4` |
+| 2 | 管理禁作弊 | 玩家侧同模式 0（tpa 工具可用，原版 `/tp` 仍限 OP）；仅 OP 被禁用 `give`、`gamemode`、`F3+F4` 快捷切换 |
+| 3 | 全部开启（0+1+2） | 玩家全开：tpa 工具 + 原版 `/tp` + 全部指令；OP 仍禁 `give` `gamemode` `F3+F4` |
 
 **规则说明**
 
 - **tpa 工具**：`tpa` `tpahere` `tpyes` `tpaccept` `tpno` `tpdeny` `tpcancel` `tplist`、`sethome` `home` `homes` `delhome` `renamehome`、`back` `tpr` `rtp`（模式 0/1/2/3 对玩家开放）
 - **原版传送**：`tp` `teleport`（模式 1/3 对玩家开放，模式 0/2 仍为 OP 指令）
 - 被禁止的指令执行时会收到红字提示，**指令补全保留**（不删除补全，仅执行时拦截）
-- `F3+F4` 快捷切换创造 / 生存等模式按 `/gamemode` 判定：模式 2 仅拦 OP，模式 3 人人拦截
+- `F3+F4` 快捷切换创造 / 生存等模式按 `/gamemode` 判定：模式 2/3 均仅拦 OP，普通玩家使用不受管控
 
 ---
 
@@ -175,6 +175,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 - 修改**立即生效**，无需重启
 - 界面自适应不同分辨率
 - 所有开关、滑块与模式选项与 `config.json` 字段一一对应
+- 1.18.2 另提供按键绑定入口（按键设置 → Myrin TP → 打开配置界面，默认未绑定）
 
 ---
 
@@ -182,7 +183,7 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 **模式 0 下为什么非 OP 不能使用 `/tp`？**
 
-模式 0 恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用，玩家改用 `/tpa` 等传送请求指令。需要对玩家开放原版 `/tp` 时切换到模式 1；若想人人可用除作弊外的全部指令（含 tpa、tp、原版基础指令），用模式 3。
+模式 0 恢复原版权限：原版 `/tp` 本身就是 OP 指令，非 OP 不可用，玩家改用 `/tpa` 等传送请求指令。需要对玩家开放原版 `/tp` 时切换到模式 1；想全部开放（玩家全开 + 管理仍禁作弊指令）用模式 3。
 
 **随机传送为什么落点总是原地或范围很小？**
 
@@ -204,18 +205,16 @@ MYRIN TP 是一个**服务端模组**：玩家无需开启作弊即可使用完�
 
 ## 从源码构建
 
-四个子工程互相独立，均由 GitHub Actions 自动构建（`build-release.yml`，四端 matrix 并行）：
+四个子工程互相独立，由 GitHub Actions 自动构建（`build-release.yml`，四端 matrix 并行）；Actions 额度用尽时可在本地构建后手动发布到 Releases：
 
 ```text
-1.18.2-forge     JDK 17 + Gradle 8.8
-1.20.1-forge     JDK 17 + Gradle 8.8
-1.21.1-neoforge  JDK 21 + Gradle 8.10.2
-26.3-fabric      JDK 25 + Gradle 9.8.0
+1.18.2-forge     JDK 17 + Gradle 8.10
+1.20.1-forge     JDK 17 + Gradle 8.10
+1.21.1-neoforge  JDK 21 + Gradle 8.10
+26.3-fabric      JDK 25 + Gradle 9.7
 ```
 
-推送 `main` 并打 tag（如 `v1.3.2`）即触发构建，产物自动发布到 [Releases](https://github.com/OvOSSK/myrin-tp/releases)，文件名为 `myrin-tp-<版本>-<加载器>-<时间戳>.jar`。
-
-本地构建：进入对应子工程目录执行 `./gradlew build`（需匹配对应 JDK）。
+推送 `main` 并打 tag（如 `v1.3.3-20261101`）即触发构建，产物自动发布到 [Releases](https://github.com/OvOSSK/myrin-tp/releases)。手动发布：本地 `gradle build` 后把 `build/libs/myrin-tp-<版本>-<加载器>-1.3.3.jar` 上传到新 release（tag 每次新开，不覆盖旧 tag）。
 
 ---
 
