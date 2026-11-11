@@ -33,7 +33,7 @@ public final class GuardNodes {
                 if (TpGuard.MOD_COMMANDS.contains(name)) {
                     continue;
                 }
-                if (TpGuard.TP_COMMANDS.contains(name)) {
+                if (TpGuard.TP_COMMANDS.contains(name) || TpGuard.EXECUTE_COMMAND.equals(name)) {
                     reqField.set(node, (Predicate<CommandSourceStack>) s -> true);
                 }
             }

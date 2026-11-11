@@ -11,6 +11,8 @@ import java.util.function.Predicate;
 /**
  * 指令树权限放开：
  * - 原版 tp/teleport 默认要求 OP 权限，这里放开给所有玩家，让生存无作弊也能看到补全并使用；
+ * - /execute 一并放开，否则非 OP 无法解析 execute in &lt;维度&gt; run tp 这类跨维度定点传送
+ *   （execute 内层真正执行的命令仍由 CommandBlocker 判定，give / gamemode 不会被绕过）；
  * - 管控拦截不在这里做（会删补全），改由全局命令执行点 CommandBlocker 按模式判定。
  * Brigadier 没提供公开的 requirement 写入方法，用反射；反射失败降级成不限制，不让服务端崩。
  */
@@ -33,7 +35,7 @@ public final class GuardNodes {
                 if (TpGuard.MOD_COMMANDS.contains(name)) {
                     continue;
                 }
-                if (TpGuard.TP_COMMANDS.contains(name)) {
+                if (TpGuard.TP_COMMANDS.contains(name) || TpGuard.EXECUTE_COMMAND.equals(name)) {
                     reqField.set(node, (Predicate<CommandSourceStack>) s -> true);
                 }
             }

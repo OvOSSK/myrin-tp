@@ -32,6 +32,13 @@ public final class TpGuard {
     /** 原版 /tp /teleport：模式1/3 对玩家开放；模式0/2 对非 OP 不开放 */
     public static final Set<String> VANILLA_TP = Set.of("tp", "teleport");
 
+    /**
+     * /execute：放开给所有玩家（否则非 OP 无法解析 execute in &lt;维度&gt; run tp 这类跨维度定点传送，
+     * 会报原版的「未知或不完整的命令」）。execute 内层真正执行的命令仍由 CommandBlocker 判定，
+     * 因此放开 execute 不会让 give / gamemode 之类被绕过。
+     */
+    public static final String EXECUTE_COMMAND = "execute";
+
     /** 模式2下仅对 OP 禁用的作弊指令（F3+F4 走 gamemode 路径，一并拦截） */
     public static final Set<String> CHEAT_COMMANDS = Set.of("give", "gamemode");
 
